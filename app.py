@@ -75,26 +75,33 @@ def html_circle_layout_js(names):
             }});
         }}
 
-        function renderStandings() {{
-            const ol = document.getElementById('standings-list');
-            ol.innerHTML = '';
-            ol.style.listStyleType = 'none';
-            ol.style.paddingLeft = '0';
-            const total = NAMES.length;
-            standings.forEach((name, idx) => {{
-                const li = document.createElement('li');
-                let placeNum = total - idx; // always use total, not standings.length
-                let placeStr =
-                    placeNum === 1 ? '1st' :
-                    placeNum === 2 ? '2nd' :
-                    placeNum === 3 ? '3rd' : placeNum + 'th';
-                li.innerText = placeStr + ' ' + name;
-                li.style.marginBottom = '4px';
-                li.style.fontWeight = 'bold';
-                li.style.color = 'white';
-                ol.appendChild(li);
-            }});
-        }}
+        function renderStandings() {
+    const ol = document.getElementById('standings-list');
+    ol.innerHTML = '';
+    ol.style.listStyleType = 'none';
+    ol.style.paddingLeft = '0';
+    const total = NAMES.length;
+    standings.forEach((name, idx) => {
+        const li = document.createElement('li');
+        let placeNum = total - idx; // always use total, not standings.length
+        let placeStr =
+            placeNum === 1 ? '1st' :
+            placeNum === 2 ? '2nd' :
+            placeNum === 3 ? '3rd' : placeNum + 'th';
+
+        // Add medals for top 3
+        let medal = '';
+        if (placeNum === 1) medal = ' 🥇';
+        else if (placeNum === 2) medal = ' 🥈';
+        else if (placeNum === 3) medal = ' 🥉';
+
+        li.innerText = placeStr + ' ' + name + medal;
+        li.style.marginBottom = '4px';
+        li.style.fontWeight = 'bold';
+        li.style.color = 'white';
+        ol.appendChild(li);
+    });
+}
 
         renderNames();
         renderStandings();
