@@ -95,8 +95,8 @@ def html_circle_layout_js(names):
         li.style.color = 'white';
         ol.appendChild(li);
     }});
-}});
-    }}
+}}
+
 
     renderNames();
     renderStandings();
