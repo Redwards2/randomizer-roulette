@@ -19,7 +19,7 @@ def html_circle_layout(names, eliminated_name=None):
             bg_color = "#ff4d4d"
             # END
         else:
-            animation_class = "float"
+            animation_class = "dvd-float"
             bg_color = "#ffeb3b"
 
         angle = 2 * 3.14159 * i / len(names)
@@ -58,18 +58,18 @@ def html_circle_layout(names, eliminated_name=None):
     animation: fall-out 1s ease-in-out forwards;
 }}
 
-@keyframes float-around {{
+@keyframes dvd-bounce {{
     0%   {{ transform: translate(-50%, -50%) translate(0px, 0px); }}
-    25%  {{ transform: translate(-50%, -50%) translate(3px, -2px); }}
-    50%  {{ transform: translate(-50%, -50%) translate(-2px, 3px); }}
-    75%  {{ transform: translate(-50%, -50%) translate(2px, -3px); }}
+    25%  {{ transform: translate(-50%, -50%) translate(20px, -20px); }}
+    50%  {{ transform: translate(-50%, -50%) translate(-20px, 20px); }}
+    75%  {{ transform: translate(-50%, -50%) translate(20px, 20px); }}
     100% {{ transform: translate(-50%, -50%) translate(0px, 0px); }}
 }}
-.float {{
-    animation: float-around 1.5s infinite ease-in-out;
+.dvd-float {{
+    animation: dvd-bounce 3s infinite ease-in-out;
 }}
 </style>
-<div style="position: relative; width: {size}px; height: {size}px; margin: auto; background: white; border-radius: 50%;">
+<div style="position: relative; width: {size}px; height: {size}px; margin: auto; background: white; border-radius: 50%; overflow: hidden;">
     {divs}
 </div>
 """
@@ -91,7 +91,7 @@ if len(names) > 10:
     names = names[:10]
 # END
 
-# START: Live elimination with float animation and circular arena
+# START: Live elimination with floating animation and bouncing effect
 if "game_active" not in st.session_state:
     st.session_state.game_active = False
 if "remaining" not in st.session_state:
