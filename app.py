@@ -13,6 +13,7 @@ def html_circle_layout(names, eliminated_name=None):
 
     divs = ""
     for i, name in enumerate(names):
+        delay = round(random.uniform(0, 2), 2)  # Always set delay first!
         if name == eliminated_name:
             # START: Falling animation class for eliminated name
             animation_class = "fall-out"
