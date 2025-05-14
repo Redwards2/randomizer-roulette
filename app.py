@@ -19,12 +19,12 @@ def html_circle_layout(names, eliminated_name=None):
             bg_color = "#ff4d4d"
             # END
         else:
-            animation_class = "rumble"
+            animation_class = "float"
             bg_color = "#ffeb3b"
 
         angle = 2 * 3.14159 * i / len(names)
-        x = center + radius * 0.9 * round(math.cos(angle), 4)
-        y = center + radius * 0.9 * round(math.sin(angle), 4)
+        x = center + radius * math.cos(angle)
+        y = center + radius * math.sin(angle)
         divs += f'''
             <div class="{animation_class}" style="
                 position: absolute;
@@ -58,18 +58,18 @@ def html_circle_layout(names, eliminated_name=None):
     animation: fall-out 1s ease-in-out forwards;
 }}
 
-@keyframes rumble {{
-    0% {{ transform: translate(-50%, -50%) rotate(0deg); }}
-    25% {{ transform: translate(-50%, -50%) rotate(1deg); }}
-    50% {{ transform: translate(-50%, -50%) rotate(-1deg); }}
-    75% {{ transform: translate(-50%, -50%) rotate(1deg); }}
-    100% {{ transform: translate(-50%, -50%) rotate(0deg); }}
+@keyframes float-around {{
+    0%   {{ transform: translate(-50%, -50%) translate(0px, 0px); }}
+    25%  {{ transform: translate(-50%, -50%) translate(3px, -2px); }}
+    50%  {{ transform: translate(-50%, -50%) translate(-2px, 3px); }}
+    75%  {{ transform: translate(-50%, -50%) translate(2px, -3px); }}
+    100% {{ transform: translate(-50%, -50%) translate(0px, 0px); }}
 }}
-.rumble {{
-    animation: rumble 0.6s infinite;
+.float {{
+    animation: float-around 1.5s infinite ease-in-out;
 }}
 </style>
-<div style="position: relative; width: {size}px; height: {size}px; margin: auto;">
+<div style="position: relative; width: {size}px; height: {size}px; margin: auto; background: white; border-radius: 50%;">
     {divs}
 </div>
 """
@@ -91,7 +91,7 @@ if len(names) > 10:
     names = names[:10]
 # END
 
-# START: Live elimination with rumble effect (rerun-safe)
+# START: Live elimination with float animation and circular arena
 if "game_active" not in st.session_state:
     st.session_state.game_active = False
 if "remaining" not in st.session_state:
@@ -109,7 +109,7 @@ if st.button("Start Elimination") and len(names) >= 2:
     st.query_params["step"] = "go"
     st.rerun()
 
-if st.session_state.game_active and len(st.session_state.remaining) > 1:
+if st.session_state.game_active and len(st.session_state.remaining) > 2:
     if st.session_state.eliminated:
         st.session_state.remaining.remove(st.session_state.eliminated)
         st.session_state.eliminated = None
@@ -126,7 +126,11 @@ if st.session_state.game_active and len(st.session_state.remaining) > 1:
     st.query_params["step"] = str(random.randint(1, 10000))
     st.rerun()
 
-elif st.session_state.game_active and len(st.session_state.remaining) == 1:
+elif st.session_state.game_active and len(st.session_state.remaining) == 2:
+    if st.session_state.eliminated:
+        st.session_state.remaining.remove(st.session_state.eliminated)
+        st.session_state.eliminated = None
+
     winner = st.session_state.remaining[0]
     st.balloons()
     st.success(f"🏆 The last person standing is: **{winner}**")
