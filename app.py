@@ -99,14 +99,15 @@ if "remaining" not in st.session_state:
 if "eliminated" not in st.session_state:
     st.session_state.eliminated = None
 
-params = st.experimental_get_query_params()
+params = st.query_params
 
 if st.button("Start Elimination") and len(names) >= 2:
     st.session_state.game_active = True
     st.session_state.remaining = names.copy()
     st.session_state.eliminated = None
-    st.experimental_set_query_params(step="go")
-    st.stop()
+    st.query_params.clear()
+    st.query_params["step"] = "go"
+    st.rerun()
 
 if st.session_state.game_active and len(st.session_state.remaining) > 1:
     if st.session_state.eliminated:
@@ -121,8 +122,9 @@ if st.session_state.game_active and len(st.session_state.remaining) > 1:
 
     # Let animation show, then schedule next rerun
     time.sleep(1.3)
-    st.experimental_set_query_params(step=str(random.randint(1, 10000)))
-    st.stop()
+    st.query_params.clear()
+    st.query_params["step"] = str(random.randint(1, 10000))
+    st.rerun()
 
 elif st.session_state.game_active and len(st.session_state.remaining) == 1:
     winner = st.session_state.remaining[0]
@@ -130,5 +132,5 @@ elif st.session_state.game_active and len(st.session_state.remaining) == 1:
     st.success(f"🏆 The last person standing is: **{winner}**")
     html_circle_layout([winner])
     st.session_state.game_active = False
-    st.experimental_set_query_params()
+    st.query_params.clear()
 # END
