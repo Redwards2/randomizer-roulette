@@ -3,7 +3,6 @@ import random
 import time
 import math  # Required for angle math
 
-
 # START: Circular layout renderer
 import streamlit.components.v1 as components
 
@@ -76,31 +75,28 @@ if len(names) > 10:
 # START: Elimination simulation
 if st.button("Start Elimination") and len(names) >= 2:
     st.success("Starting elimination round...")
-    
+
     placeholder = st.empty()
     remaining = names.copy()
 
     while len(remaining) > 1:
-    time.sleep(1.5)
-    eliminated = random.choice(remaining)
+        time.sleep(1.5)
+        eliminated = random.choice(remaining)
 
-    # First, show eliminated name with fade-out animation
-    with placeholder.container():
-        st.markdown(f"💀 **{eliminated}** has been eliminated!")
-        html_circle_layout(remaining, eliminated_name=eliminated)
-
-    time.sleep(1.2)  # Let the animation play before removing
-
-    # Now remove it for the next frame
-    remaining.remove(eliminated)
-
+        # First, show eliminated name with fade-out animation
         with placeholder.container():
             st.markdown(f"💀 **{eliminated}** has been eliminated!")
-            html_circle_layout(remaining)
+            html_circle_layout(remaining, eliminated_name=eliminated)
 
-    st.balloons()
-    st.success(f"🏆 The last person standing is: **{remaining[0]}**")
-    html_circle_layout(remaining)
+        time.sleep(1.2)  # Let the animation play before removing
+
+        # Now remove it for the next frame
+        remaining.remove(eliminated)
+
+    with placeholder.container():
+        st.balloons()
+        st.success(f"🏆 The last person standing is: **{remaining[0]}**")
+        html_circle_layout(remaining)
 
 elif len(names) < 2:
     st.info("Enter at least 2 names to begin.")
