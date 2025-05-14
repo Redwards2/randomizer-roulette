@@ -77,7 +77,7 @@ if len(names) > 10:
 if st.button("Start Elimination") and len(names) >= 2:
     st.success("Starting elimination round...")
     
-        placeholder = st.empty()
+    placeholder = st.empty()
     remaining = names.copy()
 
     while len(remaining) > 1:
