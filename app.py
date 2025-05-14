@@ -112,14 +112,13 @@ def html_circle_layout_js(names):
 # START: Standings Button and Results Table
 import pandas as pd
 
-def show_standings():
+ddef show_standings():
     standings_code = """
     <script>
     const result = window.localStorage.getItem('last_man_standing_results');
     if (result) {
         const parsed = JSON.parse(result);
-        const text = parsed.map((name, i) => `${i+1}. ${name}`).join('
-');
+        const text = parsed.map((name, i) => `${i+1}. ${name}`).join('\\n');
         const input = document.createElement('input');
         input.type = 'hidden';
         input.id = 'standings-result';
@@ -130,12 +129,9 @@ def show_standings():
     """
     components.html(standings_code, height=0)
     st.info("If results do not appear instantly, click 'Show Results' again after a few seconds.")
-    # JS can't push directly to Python, so user may need to click twice
-    # Try to read the standings via Streamlit's experimental_get_query_params (or from st.session_state in the future)
-    # Here, simply provide a text input for manual paste if automation doesn't work
     value = st.text_area("Paste results here if not auto-filled:")
     if value:
-        lines = value.strip().split('')
+        lines = value.strip().split('\n')
         st.subheader("Final Standings:")
         df = pd.DataFrame([l.split('. ', 1) for l in lines if '. ' in l], columns=["Place", "Name"])
         st.dataframe(df)
