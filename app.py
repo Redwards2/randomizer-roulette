@@ -82,7 +82,7 @@ def html_circle_layout_js(names):
         standings.forEach((name, idx) => {{
             const li = document.createElement('li');
             // Numbering: first out gets total, counts down to 1 for the winner
-            li.innerText = name + ' (' + (standings.length - idx) + ')';
+            li.innerText = (standings.length - idx) + '. ' + name;
             li.style.marginBottom = '4px';
             li.style.fontWeight = 'bold';
             li.style.color = 'white';
