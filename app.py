@@ -2,6 +2,7 @@ import streamlit as st
 import random
 import math  # Required for angle math
 import streamlit.components.v1 as components
+import time
 
 # START: Circular layout renderer
 
@@ -90,7 +91,7 @@ if len(names) > 10:
     names = names[:10]
 # END
 
-# START: Live elimination with rumble effect
+# START: Live elimination with rumble effect (rerun-safe)
 if "game_active" not in st.session_state:
     st.session_state.game_active = False
 if "remaining" not in st.session_state:
@@ -98,11 +99,14 @@ if "remaining" not in st.session_state:
 if "eliminated" not in st.session_state:
     st.session_state.eliminated = None
 
+params = st.experimental_get_query_params()
+
 if st.button("Start Elimination") and len(names) >= 2:
     st.session_state.game_active = True
     st.session_state.remaining = names.copy()
     st.session_state.eliminated = None
-    st.experimental_rerun()
+    st.experimental_set_query_params(step="go")
+    st.stop()
 
 if st.session_state.game_active and len(st.session_state.remaining) > 1:
     if st.session_state.eliminated:
@@ -115,7 +119,10 @@ if st.session_state.game_active and len(st.session_state.remaining) > 1:
     st.markdown(f"💀 **{st.session_state.eliminated}** has been eliminated!")
     html_circle_layout(st.session_state.remaining, eliminated_name=st.session_state.eliminated)
 
-    st.experimental_rerun()
+    # Let animation show, then schedule next rerun
+    time.sleep(1.3)
+    st.experimental_set_query_params(step=str(random.randint(1, 10000)))
+    st.stop()
 
 elif st.session_state.game_active and len(st.session_state.remaining) == 1:
     winner = st.session_state.remaining[0]
@@ -123,4 +130,5 @@ elif st.session_state.game_active and len(st.session_state.remaining) == 1:
     st.success(f"🏆 The last person standing is: **{winner}**")
     html_circle_layout([winner])
     st.session_state.game_active = False
+    st.experimental_set_query_params()
 # END
