@@ -135,8 +135,7 @@ def show_standings():
     # Here, simply provide a text input for manual paste if automation doesn't work
     value = st.text_area("Paste results here if not auto-filled:")
     if value:
-        lines = value.strip().split('
-')
+        lines = value.strip().split('')
         st.subheader("Final Standings:")
         df = pd.DataFrame([l.split('. ', 1) for l in lines if '. ' in l], columns=["Place", "Name"])
         st.dataframe(df)
