@@ -58,7 +58,7 @@ def html_circle_layout_js(names):
     renderNames();
     // Animate movement
     let running = true;
-let standings = [];
+    let standings = [];
     function animate() {{
         activeNames.forEach(obj => {{
             if (!obj.eliminated) {{
@@ -76,12 +76,12 @@ let standings = [];
         const stillIn = activeNames.filter(n => !n.eliminated);
         if (stillIn.length <= 1) {{
             // Winner: highlight & stop animation
-            if (stillIn[0]) {
+            if (stillIn[0]) {{
                 standings.unshift(stillIn[0].name); // Winner gets 1st place
                 stillIn[0].el.style.background = '#4ee44e';
                 stillIn[0].el.style.boxShadow = '0 0 16px #13c913, 1px 1px 4px rgba(0,0,0,0.22)';
                 stillIn[0].el.style.filter = 'drop-shadow(0 0 6px #bfffbb)';
-            }
+            }}
             // Save standings in browser storage
             window.localStorage.setItem('last_man_standing_results', JSON.stringify(standings));
             running = false;
@@ -98,9 +98,9 @@ let standings = [];
         toEliminate.el.style.opacity = 0;
         toEliminate.el.style.filter = 'blur(6px)';
         standings.unshift(toEliminate.name); // Add to standings in reverse order
-        setTimeout(() => {
+        setTimeout(() => {{
             toEliminate.el && toEliminate.el.remove();
-        }, 1100);
+        }}, 1100);
         setTimeout(eliminateNext, ELIMINATION_INTERVAL);
     }}
     setTimeout(eliminateNext, ELIMINATION_INTERVAL * 1.5); // wait a moment before first elimination
