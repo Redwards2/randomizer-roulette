@@ -19,6 +19,8 @@ def html_circle_layout_js(names):
       </div>
     </div>
     <script>
+window.addEventListener('DOMContentLoaded', function() {{
+
     const NAMES = {names_js};
     const SIZE = {size};
     const RADIUS = {radius};
@@ -147,7 +149,9 @@ def html_circle_layout_js(names):
         setTimeout(eliminateNext, ELIMINATION_INTERVAL);
     }}
     setTimeout(eliminateNext, ELIMINATION_INTERVAL * 1.5); // wait a moment before first elimination
-    </script>
+    
+}});
+</script>
     """
     components.html(html_code, height=size + 40)
 # END
