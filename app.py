@@ -13,9 +13,9 @@ def html_circle_layout_js(names):
     html_code = f"""
     <div style='display: flex; justify-content: center; align-items: flex-start; gap: 36px;'>
       <div id='arena-root'></div>
-      <div id='standings-root' style='min-width: 140px;'>
-        <div style='font-weight:bold;font-size:18px;margin-bottom:12px;'>Standings</div>
-        <ol id='standings-list' style='padding-left:22px;font-size:16px;'></ol>
+      <div id='standings-root' style='min-width: 160px;'>
+        <div style='font-weight:bold;font-size:18px;margin-bottom:12px;color:white;text-shadow:0 2px 6px #222;'>Standings</div>
+        <ol id='standings-list' style='padding-left:22px;font-size:16px;list-style-position:inside; color:white; font-weight:bold;'></ol>
       </div>
     </div>
     <script>
@@ -23,6 +23,12 @@ def html_circle_layout_js(names):
     const SIZE = {size};
     const RADIUS = {radius};
     const ELIMINATION_INTERVAL = 1600; // ms
+
+    // Dark background behind standings
+    document.getElementById('standings-root').style.background = "#222";
+    document.getElementById('standings-root').style.borderRadius = "14px";
+    document.getElementById('standings-root').style.padding = "18px 10px 18px 6px";
+    document.getElementById('standings-root').style.boxShadow = "0 0 8px #0008";
 
     const arena = document.createElement('div');
     arena.style.position = 'relative';
@@ -72,11 +78,13 @@ def html_circle_layout_js(names):
         const ol = document.getElementById('standings-list');
         ol.innerHTML = '';
         const total = NAMES.length;
+        // Inverse order: first out at top (10th), winner at bottom (1st)
         standings.forEach((name, idx) => {{
             const li = document.createElement('li');
-            li.innerText = name + ' (' + (total - idx) + ')';
+            li.innerText = name + ' (' + (idx+1) + ')';
             li.style.marginBottom = '4px';
-            li.style.fontWeight = idx === 0 ? 'bold' : 'normal';
+            li.style.fontWeight = 'bold';
+            li.style.color = 'white';
             ol.appendChild(li);
         }});
     }}
@@ -102,7 +110,7 @@ def html_circle_layout_js(names):
         if (stillIn.length <= 1) {{
             // Winner: highlight & stop animation
             if (stillIn[0]) {{
-                standings.unshift(stillIn[0].name); // Winner gets 1st place
+                standings.push(stillIn[0].name); // Winner gets 1st place at the bottom
                 stillIn[0].el.style.background = '#4ee44e';
                 stillIn[0].el.style.boxShadow = '0 0 16px #13c913, 1px 1px 4px rgba(0,0,0,0.22)';
                 stillIn[0].el.style.filter = 'drop-shadow(0 0 6px #bfffbb)';
@@ -122,7 +130,7 @@ def html_circle_layout_js(names):
         toEliminate.el.style.top = (SIZE / 2 + Math.sin(flyAngle) * (RADIUS + 110)) + 'px';
         toEliminate.el.style.opacity = 0;
         toEliminate.el.style.filter = 'blur(6px)';
-        standings.unshift(toEliminate.name); // Add eliminated to standings (reverse order)
+        standings.push(toEliminate.name); // Add eliminated to end (inverse standings)
         renderStandings();
         setTimeout(() => {{
             toEliminate.el && toEliminate.el.remove();
