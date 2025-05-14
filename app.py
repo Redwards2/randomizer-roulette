@@ -81,7 +81,8 @@ def html_circle_layout_js(names):
         // Inverse order: first out at top (10th), winner at bottom (1st)
         standings.forEach((name, idx) => {{
             const li = document.createElement('li');
-            li.innerText = name + ' (' + (idx+1) + ')';
+            // Numbering: first out gets total, counts down to 1 for the winner
+            li.innerText = name + ' (' + (standings.length - idx) + ')';
             li.style.marginBottom = '4px';
             li.style.fontWeight = 'bold';
             li.style.color = 'white';
