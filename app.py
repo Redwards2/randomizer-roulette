@@ -39,7 +39,7 @@ def html_circle_layout(names, eliminated_name=None):
                 font-weight: bold;
                 box-shadow: 1px 1px 4px rgba(0,0,0,0.3);
                 white-space: nowrap;
-                animation-delay: " + "{delay:.2f}s;
+                animation-delay: {delay:.2f}s;
             ">
                 {name}
             </div>
