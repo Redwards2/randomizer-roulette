@@ -91,11 +91,10 @@ def html_circle_layout_js(names):
             el: null,
         }}));
 
-        let running = true;
+        let running = True;
         let standings = [];
 
         function sparkle(el) {{
-            // quick sparkle effect
             let s = document.createElement('div');
             s.style.position = 'absolute';
             s.style.left = '50%'; s.style.top = '50%';
@@ -113,13 +112,18 @@ def html_circle_layout_js(names):
             arena.innerHTML = '';
             activeNames.forEach((obj, i) => {{
                 if (obj.eliminated) return;
+                // Add sporadic 'wiggle' to make the motion more fun
+                let wiggleR = (Math.random() - 0.5) * 34; // +/- 17px radius wiggle
+                let angleWiggle = (Math.random() - 0.5) * 0.35; // +/- ~20deg angle
+                let posRadius = RADIUS + wiggleR;
+                let posAngle = obj.angle + angleWiggle;
                 let el = document.createElement('div');
                 obj.el = el;
                 el.innerText = obj.name;
                 el.style.position = 'absolute';
                 el.style.fontWeight = '900';
-                el.style.left = (SIZE / 2 + Math.cos(obj.angle) * RADIUS) + 'px';
-                el.style.top = (SIZE / 2 + Math.sin(obj.angle) * RADIUS) + 'px';
+                el.style.left = (SIZE / 2 + Math.cos(posAngle) * posRadius) + 'px';
+                el.style.top = (SIZE / 2 + Math.sin(posAngle) * posRadius) + 'px';
                 el.style.transform = 'translate(-50%,-50%) scale(1)';
                 el.style.padding = '11px 20px';
                 el.style.borderRadius = '99px';
@@ -242,23 +246,23 @@ def html_circle_layout_js(names):
     components.html(html_code, height=size + 60)
 # END
 
-
-# START: Streamlit setup
+# SIDEBAR INPUT ONLY VERSION
 st.set_page_config(page_title="Last Man Standing", layout="centered")
 st.title("🎯 Last Man Standing - Randomizer")
-# END
 
-# START: Name entry
-names_input = st.text_area("Enter up to 10 names (one per line)", height=200)
+with st.sidebar:
+    st.header("Enter Names")
+    names_input = st.text_area("Up to 10 names (one per line)", height=200)
+    start = st.button("Start Elimination")
+    st.markdown("**App by [your name or brand]**", unsafe_allow_html=True)
+
 names = [name.strip() for name in names_input.split("\n") if name.strip()]
-
 if len(names) > 10:
     st.warning("Only the first 10 names will be used.")
     names = names[:10]
-# END
 
-# START: Live elimination - JS arena version
-if st.button("Start Elimination") and len(names) >= 2:
+if start and len(names) >= 2:
     st.success("Let the chaos begin!")
     html_circle_layout_js(names)
-# END
+elif start:
+    st.info("Add at least 2 names in the sidebar and hit Start Elimination.")
