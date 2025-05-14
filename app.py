@@ -8,13 +8,58 @@ import time
 def html_circle_layout_js(names):
     import json
     names_js = json.dumps(names)
-    size = 380
-    radius = 145
+    size = 400
+    radius = 155
     html_code = f"""
-    <div style='display: flex; justify-content: center; align-items: flex-start; gap: 36px;'>
+    <style>
+    body, .stApp {{
+      background: linear-gradient(135deg, #232946 0%, #00cfff 100%) !important;
+    }}
+    #arena-root {{
+      filter: drop-shadow(0 6px 18px #0007);
+    }}
+    #standings-root {{
+      background: #222c;
+      border-radius: 18px;
+      padding: 22px 16px 22px 12px;
+      box-shadow: 0 4px 24px #0016, 0 0 0 2px #66e4ff88;
+      min-width: 175px;
+    }}
+    #standings-root > div:first-child {{
+      font-family: 'Montserrat', 'Arial Black', sans-serif;
+      letter-spacing: 1px;
+      font-weight: 800;
+      font-size: 23px !important;
+      margin-bottom: 18px !important;
+      color: #fff;
+      text-shadow: 0 2px 10px #0bb8ff, 0 0px 1px #111, 0 1px 4px #00cfff90;
+      text-align: center;
+      background: linear-gradient(92deg, #3dd8fa 0%, #ffea36 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: brightness(1.5);
+    }}
+    #standings-list li {{
+      font-family: 'Montserrat', 'Arial Black', sans-serif;
+      font-size: 18px;
+      margin-bottom: 6px;
+      transition: background 0.3s, color 0.3s;
+      border-radius: 8px;
+      padding: 1px 4px 1px 0;
+      box-shadow: none;
+    }}
+    #standings-list li:first-child {{
+      border-top-left-radius: 20px; border-top-right-radius: 20px;
+    }}
+    #standings-list li:last-child {{
+      border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;
+    }}
+    </style>
+    <div style='display: flex; justify-content: center; align-items: flex-start; gap: 40px;'>
       <div id='arena-root'></div>
-      <div id='standings-root' style='min-width: 160px;'>
-        <div style='font-weight:bold;font-size:18px;margin-bottom:12px;color:white;text-shadow:0 2px 6px #222;'>Standings</div>
+      <div id='standings-root'>
+        <div>Standings</div>
         <ol id='standings-list' style='padding-left:0;font-size:16px;list-style-type:none; color:white; font-weight:bold;'></ol>
       </div>
     </div>
@@ -24,25 +69,19 @@ def html_circle_layout_js(names):
         const SIZE = {size};
         const RADIUS = {radius};
         function randomDelay() {{
-    // Returns a random delay in milliseconds between 5000 and 10000
-    return Math.floor(Math.random() * 5000) + 5000;
-}}
-
-        // Dark background behind standings
-        document.getElementById('standings-root').style.background = "#222";
-        document.getElementById('standings-root').style.borderRadius = "14px";
-        document.getElementById('standings-root').style.padding = "18px 10px 18px 6px";
-        document.getElementById('standings-root').style.boxShadow = "0 0 8px #0008";
+            return Math.floor(Math.random() * 5000) + 5000;
+        }}
 
         const arena = document.createElement('div');
         arena.style.position = 'relative';
         arena.style.width = SIZE + 'px';
         arena.style.height = SIZE + 'px';
         arena.style.margin = 'auto';
-        arena.style.background = 'white';
+        arena.style.background = 'radial-gradient(ellipse at 60% 40%, #fffc 60%, #4ee1fa33 98%, #232946 120%)';
         arena.style.borderRadius = '50%';
         arena.style.overflow = 'hidden';
-        arena.style.boxShadow = '0 0 30px #ddd';
+        arena.style.boxShadow = '0 6px 38px #0ad6, 0 1px 32px #0099ff44';
+        arena.style.border = '6px solid #3df0fa';
         document.getElementById('arena-root').appendChild(arena);
 
         let activeNames = NAMES.map((name, idx) => ({{ 
@@ -55,6 +94,21 @@ def html_circle_layout_js(names):
         let running = true;
         let standings = [];
 
+        function sparkle(el) {{
+            // quick sparkle effect
+            let s = document.createElement('div');
+            s.style.position = 'absolute';
+            s.style.left = '50%'; s.style.top = '50%';
+            s.style.width = '36px'; s.style.height = '36px';
+            s.style.pointerEvents = 'none';
+            s.style.transform = 'translate(-50%,-50%)';
+            s.style.borderRadius = '50%';
+            s.style.zIndex = 6;
+            s.innerHTML = '<svg width=\"36\" height=\"36\"><circle cx=\"18\" cy=\"18\" r=\"14\" fill=\"none\" stroke=\"#ffe52e\" stroke-width=\"4\" opacity=\"0.62\"/><circle cx=\"18\" cy=\"18\" r=\"10\" fill=\"#fffdbb99\" opacity=\"0.45\"/></svg>';
+            el.appendChild(s);
+            setTimeout(() => s.remove(), 900);
+        }}
+
         function renderNames() {{
             arena.innerHTML = '';
             activeNames.forEach((obj, i) => {{
@@ -63,15 +117,19 @@ def html_circle_layout_js(names):
                 obj.el = el;
                 el.innerText = obj.name;
                 el.style.position = 'absolute';
-                el.style.fontWeight = 'bold';
+                el.style.fontWeight = '900';
                 el.style.left = (SIZE / 2 + Math.cos(obj.angle) * RADIUS) + 'px';
                 el.style.top = (SIZE / 2 + Math.sin(obj.angle) * RADIUS) + 'px';
-                el.style.transform = 'translate(-50%,-50%)';
-                el.style.padding = '7px 13px';
-                el.style.borderRadius = '11px';
-                el.style.background = '#ffeb3b';
-                el.style.boxShadow = '1px 1px 4px rgba(0,0,0,0.28)';
-                el.style.transition = 'opacity 1s, filter 1.2s, left 0.4s, top 0.4s';
+                el.style.transform = 'translate(-50%,-50%) scale(1)';
+                el.style.padding = '11px 20px';
+                el.style.borderRadius = '99px';
+                el.style.background = 'linear-gradient(95deg, #f1f7b4 0%, #faf8e4 80%)';
+                el.style.boxShadow = '0 3px 16px #f1f6bb88, 0 1px 8px #1b87f755';
+                el.style.border = '2.8px solid #20e7ef';
+                el.style.transition = 'opacity 1.2s, filter 1.3s, left 0.6s, top 0.6s, transform 0.3s cubic-bezier(.23,1.5,.32,1)';
+                el.style.fontFamily = 'Montserrat, Arial Black, sans-serif';
+                el.style.color = '#33394b';
+                el.style.textShadow = '0 2px 12px #fffcc960, 0 1px 1px #fff';
                 el.style.zIndex = 3;
                 el.style.userSelect = 'none';
                 arena.appendChild(el);
@@ -98,7 +156,15 @@ def html_circle_layout_js(names):
                 li.innerText = placeStr + ' ' + name + medal;
                 li.style.marginBottom = '4px';
                 li.style.fontWeight = 'bold';
-                li.style.color = 'white';
+                li.style.color = placeNum === 1 ? '#ffdb57'
+                    : placeNum === 2 ? '#bfe3ef'
+                    : placeNum === 3 ? '#ffb55b'
+                    : 'white';
+                li.style.background = placeNum === 1 ? '#3d2c06'
+                    : placeNum === 2 ? '#253942'
+                    : placeNum === 3 ? '#3b2410'
+                    : 'none';
+                li.style.boxShadow = placeNum <= 3 ? '0 2px 10px #0ee8, 0 1px 2px #fff1' : 'none';
                 ol.appendChild(li);
             }});
         }}
@@ -125,8 +191,11 @@ def html_circle_layout_js(names):
                 if (stillIn[0]) {{
                     standings.push(stillIn[0].name);
                     stillIn[0].el.style.background = '#4ee44e';
-                    stillIn[0].el.style.boxShadow = '0 0 16px #13c913, 1px 1px 4px rgba(0,0,0,0.22)';
-                    stillIn[0].el.style.filter = 'drop-shadow(0 0 6px #bfffbb)';
+                    stillIn[0].el.style.boxShadow = '0 0 24px #13c913, 0 1px 2px #fff1';
+                    stillIn[0].el.style.filter = 'drop-shadow(0 0 14px #bfffbb)';
+                    stillIn[0].el.style.transform = 'translate(-50%,-50%) scale(1.12)';
+                    stillIn[0].el.style.color = '#111';
+                    setTimeout(() => sparkle(stillIn[0].el), 250);
                 }}
                 renderStandings();
                 running = false;
@@ -135,25 +204,42 @@ def html_circle_layout_js(names):
             }}
             const toEliminate = stillIn[Math.floor(Math.random() * stillIn.length)];
             toEliminate.eliminated = true;
-            toEliminate.el.style.transition = 'opacity 1s, filter 1.2s, left 0.7s, top 0.7s';
+            toEliminate.el.style.transition = 'opacity 1.2s, filter 1.3s, left 0.9s, top 0.9s, transform 0.6s cubic-bezier(.23,1.5,.32,1)';
             const flyAngle = toEliminate.angle;
             toEliminate.el.style.left = (SIZE / 2 + Math.cos(flyAngle) * (RADIUS + 110)) + 'px';
             toEliminate.el.style.top = (SIZE / 2 + Math.sin(flyAngle) * (RADIUS + 110)) + 'px';
             toEliminate.el.style.opacity = 0;
-            toEliminate.el.style.filter = 'blur(6px)';
+            toEliminate.el.style.filter = 'blur(8px) brightness(2)';
+            toEliminate.el.style.transform = 'translate(-50%,-50%) scale(1.18) rotate(-17deg)';
+            sparkle(toEliminate.el);
             standings.push(toEliminate.name);
             renderStandings();
             setTimeout(() => {{
                 toEliminate.el && toEliminate.el.remove();
+                const stillLeft = activeNames.filter(n => !n.eliminated);
+                if (stillLeft.length > 1) {{
+                    setTimeout(eliminateNext, randomDelay());
+                }} else {{
+                    if (stillLeft[0]) {{
+                        standings.push(stillLeft[0].name);
+                        stillLeft[0].el.style.background = '#4ee44e';
+                        stillLeft[0].el.style.boxShadow = '0 0 24px #13c913, 0 1px 2px #fff1';
+                        stillLeft[0].el.style.filter = 'drop-shadow(0 0 14px #bfffbb)';
+                        stillLeft[0].el.style.transform = 'translate(-50%,-50%) scale(1.12)';
+                        stillLeft[0].el.style.color = '#111';
+                        setTimeout(() => sparkle(stillLeft[0].el), 300);
+                    }}
+                    renderStandings();
+                    running = false;
+                    window.localStorage.setItem('last_man_standing_results', JSON.stringify(standings));
+                }}
             }}, 1100);
-            setTimeout(eliminateNext, randomDelay());
         }}
         setTimeout(eliminateNext, randomDelay());
-
     }});
     </script>
     """
-    components.html(html_code, height=size + 40)
+    components.html(html_code, height=size + 60)
 # END
 
 
