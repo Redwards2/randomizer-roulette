@@ -1,10 +1,9 @@
 import streamlit as st
 import random
-import time
 import math  # Required for angle math
+import streamlit.components.v1 as components
 
 # START: Circular layout renderer
-import streamlit.components.v1 as components
 
 def html_circle_layout(names, eliminated_name=None):
     radius = 120
@@ -19,7 +18,7 @@ def html_circle_layout(names, eliminated_name=None):
             bg_color = "#ff4d4d"
             # END
         else:
-            animation_class = ""
+            animation_class = "rumble"
             bg_color = "#ffeb3b"
 
         angle = 2 * 3.14159 * i / len(names)
@@ -57,6 +56,17 @@ def html_circle_layout(names, eliminated_name=None):
 .fall-out {{
     animation: fall-out 1s ease-in-out forwards;
 }}
+
+@keyframes rumble {{
+    0% {{ transform: translate(-50%, -50%) rotate(0deg); }}
+    25% {{ transform: translate(-50%, -50%) rotate(1deg); }}
+    50% {{ transform: translate(-50%, -50%) rotate(-1deg); }}
+    75% {{ transform: translate(-50%, -50%) rotate(1deg); }}
+    100% {{ transform: translate(-50%, -50%) rotate(0deg); }}
+}}
+.rumble {{
+    animation: rumble 0.6s infinite;
+}}
 </style>
 <div style="position: relative; width: {size}px; height: {size}px; margin: auto;">
     {divs}
@@ -80,32 +90,37 @@ if len(names) > 10:
     names = names[:10]
 # END
 
-# START: Elimination simulation
+# START: Live elimination with rumble effect
+if "game_active" not in st.session_state:
+    st.session_state.game_active = False
+if "remaining" not in st.session_state:
+    st.session_state.remaining = []
+if "eliminated" not in st.session_state:
+    st.session_state.eliminated = None
+
 if st.button("Start Elimination") and len(names) >= 2:
-    st.success("Starting elimination round...")
+    st.session_state.game_active = True
+    st.session_state.remaining = names.copy()
+    st.session_state.eliminated = None
+    st.experimental_rerun()
 
-    placeholder = st.empty()
-    remaining = names.copy()
+if st.session_state.game_active and len(st.session_state.remaining) > 1:
+    if st.session_state.eliminated:
+        st.session_state.remaining.remove(st.session_state.eliminated)
+        st.session_state.eliminated = None
 
-    while len(remaining) > 1:
-        time.sleep(1.5)
-        eliminated = random.choice(remaining)
+    # Pick next name to eliminate
+    st.session_state.eliminated = random.choice(st.session_state.remaining)
 
-        # First, show eliminated name with falling animation
-        with placeholder.container():
-            st.markdown(f"💀 **{eliminated}** has been eliminated!")
-            html_circle_layout(remaining, eliminated_name=eliminated)
+    st.markdown(f"💀 **{st.session_state.eliminated}** has been eliminated!")
+    html_circle_layout(st.session_state.remaining, eliminated_name=st.session_state.eliminated)
 
-        time.sleep(1.2)  # Let the animation play before removing
+    st.experimental_rerun()
 
-        # Now remove it for the next frame
-        remaining.remove(eliminated)
-
-    with placeholder.container():
-        st.balloons()
-        st.success(f"🏆 The last person standing is: **{remaining[0]}**")
-        html_circle_layout(remaining)
-
-elif len(names) < 2:
-    st.info("Enter at least 2 names to begin.")
+elif st.session_state.game_active and len(st.session_state.remaining) == 1:
+    winner = st.session_state.remaining[0]
+    st.balloons()
+    st.success(f"🏆 The last person standing is: **{winner}**")
+    html_circle_layout([winner])
+    st.session_state.game_active = False
 # END
