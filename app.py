@@ -3,6 +3,10 @@ import random
 import math  # Required for angle math
 import streamlit.components.v1 as components
 import time
+import pandas as pd
+
+st.set_page_config(page_title="Last Man Standing", layout="centered")
+st.title("🎯 Last Man Standing - Randomizer")
 
 # START: Circular layout renderer (JS Version)
 def html_circle_layout_js(names):
@@ -110,7 +114,6 @@ def html_circle_layout_js(names):
 # END
 
 # START: Standings Button and Results Table
-import pandas as pd
 
 def show_standings():
     standings_code = """
@@ -138,10 +141,6 @@ def show_standings():
 
 if st.button("Show Results"):
     show_standings()
-# END
-# START: Streamlit setup
-st.set_page_config(page_title="Last Man Standing", layout="centered")
-st.title("🎯 Last Man Standing - Randomizer")
 # END
 
 # START: Name entry
