@@ -76,28 +76,28 @@ window.addEventListener('DOMContentLoaded', function() {{
         }});
     }}
 
-    function renderStandings() {{
+    function renderStandings() {
     const ol = document.getElementById('standings-list');
     ol.innerHTML = '';
     ol.style.listStyleType = 'none';
     ol.style.paddingLeft = '0';
     const total = NAMES.length;
-    // Inverse order: first out at top (10th), winner at bottom (1st)
-    standings.forEach((name, idx) => {{
+
+    // First eliminated gets total-th place, winner always gets 1st
+    standings.forEach((name, idx) => {
         const li = document.createElement('li');
-        let placeNum = standings.length - idx;
-        let placeStr = (
+        let placeNum = total - idx; // always use total, not standings.length
+        let placeStr =
             placeNum === 1 ? '1st' :
             placeNum === 2 ? '2nd' :
-            placeNum === 3 ? '3rd' : placeNum + 'th'
-        );
+            placeNum === 3 ? '3rd' : placeNum + 'th';
         li.innerText = placeStr + ' ' + name;
         li.style.marginBottom = '4px';
         li.style.fontWeight = 'bold';
         li.style.color = 'white';
         ol.appendChild(li);
-    }});
-}}
+    });
+}
 
 
     renderNames();
