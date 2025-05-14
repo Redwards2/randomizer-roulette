@@ -14,18 +14,19 @@ def html_circle_layout(names, eliminated_name=None):
     divs = ""
     for i, name in enumerate(names):
         if name == eliminated_name:
-            # Add fading animation class
-            fade_class = "fade-out"
+            # START: Falling animation class for eliminated name
+            animation_class = "fall-out"
             bg_color = "#ff4d4d"
+            # END
         else:
-            fade_class = ""
+            animation_class = ""
             bg_color = "#ffeb3b"
 
         angle = 2 * 3.14159 * i / len(names)
         x = center + radius * 0.9 * round(math.cos(angle), 4)
         y = center + radius * 0.9 * round(math.sin(angle), 4)
         divs += f'''
-            <div class="{fade_class}" style="
+            <div class="{animation_class}" style="
                 position: absolute;
                 left: {x}px;
                 top: {y}px;
@@ -36,7 +37,6 @@ def html_circle_layout(names, eliminated_name=None):
                 font-weight: bold;
                 box-shadow: 1px 1px 4px rgba(0,0,0,0.3);
                 white-space: nowrap;
-                transition: all 1s ease-in-out;
             ">
                 {name}
             </div>
@@ -44,10 +44,18 @@ def html_circle_layout(names, eliminated_name=None):
 
     html_code = f"""
 <style>
-.fade-out {{
-    opacity: 0.2;
-    transform: translate(-50%, -50%) scale(0.7);
-    transition: all 1s ease-in-out;
+@keyframes fall-out {{
+    0% {{
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }}
+    100% {{
+        opacity: 0;
+        transform: translate(-50%, -200%) scale(0.5);
+    }}
+}}
+.fall-out {{
+    animation: fall-out 1s ease-in-out forwards;
 }}
 </style>
 <div style="position: relative; width: {size}px; height: {size}px; margin: auto;">
@@ -83,7 +91,7 @@ if st.button("Start Elimination") and len(names) >= 2:
         time.sleep(1.5)
         eliminated = random.choice(remaining)
 
-        # First, show eliminated name with fade-out animation
+        # First, show eliminated name with falling animation
         with placeholder.container():
             st.markdown(f"💀 **{eliminated}** has been eliminated!")
             html_circle_layout(remaining, eliminated_name=eliminated)
