@@ -10,32 +10,32 @@ def html_circle_layout_js(names):
     names_js = json.dumps(names)
     size = 380  # pixels, adjust as needed
     radius = 145
-    html_code = f'''
-    <div id="arena-root"></div>
+    html_code = f"""
+    <div id='arena-root'></div>
     <script>
     const NAMES = {names_js};
     const SIZE = {size};
     const RADIUS = {radius};
     const ELIMINATION_INTERVAL = 1600; // ms
-    const arena = document.createElement("div");
-    arena.style.position = "relative";
-    arena.style.width = SIZE + "px";
-    arena.style.height = SIZE + "px";
-    arena.style.margin = "auto";
-    arena.style.background = "white";
-    arena.style.borderRadius = "50%";
-    arena.style.overflow = "hidden";
-    arena.style.boxShadow = "0 0 30px #ddd";
-    document.getElementById("arena-root").appendChild(arena);
-    let activeNames = NAMES.map((name, idx) => ({
+    const arena = document.createElement('div');
+    arena.style.position = 'relative';
+    arena.style.width = SIZE + 'px';
+    arena.style.height = SIZE + 'px';
+    arena.style.margin = 'auto';
+    arena.style.background = 'white';
+    arena.style.borderRadius = '50%';
+    arena.style.overflow = 'hidden';
+    arena.style.boxShadow = '0 0 30px #ddd';
+    document.getElementById('arena-root').appendChild(arena);
+    let activeNames = NAMES.map((name, idx) => ({{
         name,
         angle: (2 * Math.PI * idx) / NAMES.length + Math.random(), // slightly random
         speed: (Math.random() * 0.025 + 0.01) * (Math.random() < 0.5 ? 1 : -1), // random direction
         el: null,
-    }));
-    function renderNames() {
+    }}));
+    function renderNames() {{
         arena.innerHTML = '';
-        activeNames.forEach((obj, i) => {
+        activeNames.forEach((obj, i) => {{
             if (obj.eliminated) return;
             let el = document.createElement('div');
             obj.el = el;
@@ -53,36 +53,36 @@ def html_circle_layout_js(names):
             el.style.zIndex = 3;
             el.style.userSelect = 'none';
             arena.appendChild(el);
-        });
-    }
+        }});
+    }}
     renderNames();
     // Animate movement
     let running = true;
-    function animate() {
-        activeNames.forEach(obj => {
-            if (!obj.eliminated) {
+    function animate() {{
+        activeNames.forEach(obj => {{
+            if (!obj.eliminated) {{
                 obj.angle += obj.speed;
                 if (obj.angle > 2 * Math.PI) obj.angle -= 2 * Math.PI;
                 if (obj.angle < 0) obj.angle += 2 * Math.PI;
-            }
-        });
+            }}
+        }});
         renderNames();
         if (running) requestAnimationFrame(animate);
-    }
+    }}
     animate();
     // Eliminate names one by one
-    function eliminateNext() {
+    function eliminateNext() {{
         const stillIn = activeNames.filter(n => !n.eliminated);
-        if (stillIn.length <= 1) {
+        if (stillIn.length <= 1) {{
             // Winner: highlight & stop animation
-            if (stillIn[0]) {
+            if (stillIn[0]) {{
                 stillIn[0].el.style.background = '#4ee44e';
                 stillIn[0].el.style.boxShadow = '0 0 16px #13c913, 1px 1px 4px rgba(0,0,0,0.22)';
                 stillIn[0].el.style.filter = 'drop-shadow(0 0 6px #bfffbb)';
-            }
+            }}
             running = false;
             return;
-        }
+        }}
         // Pick random to eliminate
         const toEliminate = stillIn[Math.floor(Math.random() * stillIn.length)];
         toEliminate.eliminated = true;
@@ -93,14 +93,14 @@ def html_circle_layout_js(names):
         toEliminate.el.style.top = (SIZE / 2 + Math.sin(flyAngle) * (RADIUS + 110)) + 'px';
         toEliminate.el.style.opacity = 0;
         toEliminate.el.style.filter = 'blur(6px)';
-        setTimeout(() => {
+        setTimeout(() => {{
             toEliminate.el && toEliminate.el.remove();
-        }, 1100);
+        }}, 1100);
         setTimeout(eliminateNext, ELIMINATION_INTERVAL);
-    }
+    }}
     setTimeout(eliminateNext, ELIMINATION_INTERVAL * 1.5); // wait a moment before first elimination
     </script>
-    '''
+    """
     components.html(html_code, height=size + 40)
 # END
         else:
