@@ -1,6 +1,48 @@
 import streamlit as st
 import random
 import time
+import math  # Required for angle math
+
+
+# START: Circular layout renderer
+import streamlit.components.v1 as components
+
+def html_circle_layout(names, eliminated_name=None):
+    radius = 120
+    size = 300
+    center = size // 2
+
+    divs = ""
+    for i, name in enumerate(names):
+        if name == eliminated_name:
+            continue  # Skip eliminated name
+        angle = 2 * 3.14159 * i / len(names)
+        x = center + radius * 0.9 * round(math.cos(angle), 4)
+        y = center + radius * 0.9 * round(math.sin(angle), 4)
+        divs += f'''
+            <div style="
+                position: absolute;
+                left: {x}px;
+                top: {y}px;
+                transform: translate(-50%, -50%);
+                background-color: #ffeb3b;
+                padding: 6px 12px;
+                border-radius: 10px;
+                font-weight: bold;
+                box-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+                white-space: nowrap;
+            ">
+                {name}
+            </div>
+        '''
+
+    html_code = f"""
+    <div style="position: relative; width: {size}px; height: {size}px; margin: auto;">
+        {divs}
+    </div>
+    """
+    components.html(html_code, height=size + 40)
+# END
 
 # START: Streamlit setup
 st.set_page_config(page_title="Last Man Standing", layout="centered")
@@ -20,18 +62,21 @@ if len(names) > 10:
 if st.button("Start Elimination") and len(names) >= 2:
     st.success("Starting elimination round...")
     
-    placeholder = st.empty()
+        placeholder = st.empty()
     remaining = names.copy()
-    
+
     while len(remaining) > 1:
         time.sleep(1.5)
         eliminated = random.choice(remaining)
         remaining.remove(eliminated)
-        placeholder.markdown(f"💀 **{eliminated}** has been eliminated!")
-        st.write("Remaining:", remaining)
-    
+
+        with placeholder.container():
+            st.markdown(f"💀 **{eliminated}** has been eliminated!")
+            html_circle_layout(remaining)
+
     st.balloons()
     st.success(f"🏆 The last person standing is: **{remaining[0]}**")
+    html_circle_layout(remaining)
 
 elif len(names) < 2:
     st.info("Enter at least 2 names to begin.")
