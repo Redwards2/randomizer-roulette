@@ -15,32 +15,47 @@ def html_circle_layout(names, eliminated_name=None):
     divs = ""
     for i, name in enumerate(names):
         if name == eliminated_name:
-            continue  # Skip eliminated name
+            # Add fading animation class
+            fade_class = "fade-out"
+            bg_color = "#ff4d4d"
+        else:
+            fade_class = ""
+            bg_color = "#ffeb3b"
+
         angle = 2 * 3.14159 * i / len(names)
         x = center + radius * 0.9 * round(math.cos(angle), 4)
         y = center + radius * 0.9 * round(math.sin(angle), 4)
         divs += f'''
-            <div style="
+            <div class="{fade_class}" style="
                 position: absolute;
                 left: {x}px;
                 top: {y}px;
                 transform: translate(-50%, -50%);
-                background-color: #ffeb3b;
+                background-color: {bg_color};
                 padding: 6px 12px;
                 border-radius: 10px;
                 font-weight: bold;
                 box-shadow: 1px 1px 4px rgba(0,0,0,0.3);
                 white-space: nowrap;
+                transition: all 1s ease-in-out;
             ">
                 {name}
             </div>
         '''
 
     html_code = f"""
-    <div style="position: relative; width: {size}px; height: {size}px; margin: auto;">
-        {divs}
-    </div>
-    """
+<style>
+.fade-out {{
+    opacity: 0.2;
+    transform: translate(-50%, -50%) scale(0.7);
+    transition: all 1s ease-in-out;
+}}
+</style>
+<div style="position: relative; width: {size}px; height: {size}px; margin: auto;">
+    {divs}
+</div>
+"""
+
     components.html(html_code, height=size + 40)
 # END
 
@@ -66,9 +81,18 @@ if st.button("Start Elimination") and len(names) >= 2:
     remaining = names.copy()
 
     while len(remaining) > 1:
-        time.sleep(1.5)
-        eliminated = random.choice(remaining)
-        remaining.remove(eliminated)
+    time.sleep(1.5)
+    eliminated = random.choice(remaining)
+
+    # First, show eliminated name with fade-out animation
+    with placeholder.container():
+        st.markdown(f"💀 **{eliminated}** has been eliminated!")
+        html_circle_layout(remaining, eliminated_name=eliminated)
+
+    time.sleep(1.2)  # Let the animation play before removing
+
+    # Now remove it for the next frame
+    remaining.remove(eliminated)
 
         with placeholder.container():
             st.markdown(f"💀 **{eliminated}** has been eliminated!")
