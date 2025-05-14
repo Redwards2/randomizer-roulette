@@ -13,55 +13,55 @@ def html_circle_layout_js(names):
     html_code = f"""
     <style>
     body, .stApp {{
-      background: linear-gradient(135deg, #232946 0%, #00cfff 100%) !important;
+        background: linear-gradient(135deg, #232946 0%, #00cfff 100%) !important;
     }}
     #arena-root {{
-      filter: drop-shadow(0 6px 18px #0007);
+        filter: drop-shadow(0 6px 18px #0007);
     }}
     #standings-root {{
-      background: #222c;
-      border-radius: 18px;
-      padding: 22px 16px 22px 12px;
-      box-shadow: 0 4px 24px #0016, 0 0 0 2px #66e4ff88;
-      min-width: 175px;
+        background: #222c;
+        border-radius: 18px;
+        padding: 22px 16px 22px 12px;
+        box-shadow: 0 4px 24px #0016, 0 0 0 2px #66e4ff88;
+        min-width: 175px;
     }}
     #standings-root > div:first-child {{
-      font-family: 'Montserrat', 'Arial Black', sans-serif;
-      letter-spacing: 1px;
-      font-weight: 800;
-      font-size: 23px !important;
-      margin-bottom: 18px !important;
-      color: #fff;
-      text-shadow: 0 2px 10px #0bb8ff, 0 0px 1px #111, 0 1px 4px #00cfff90;
-      text-align: center;
-      background: linear-gradient(92deg, #3dd8fa 0%, #ffea36 100%);
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      filter: brightness(1.5);
+        font-family: 'Montserrat', 'Arial Black', sans-serif;
+        letter-spacing: 1px;
+        font-weight: 800;
+        font-size: 23px !important;
+        margin-bottom: 18px !important;
+        color: #fff;
+        text-shadow: 0 2px 10px #0bb8ff, 0 0px 1px #111, 0 1px 4px #00cfff90;
+        text-align: center;
+        background: linear-gradient(92deg, #3dd8fa 0%, #ffea36 100%);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: brightness(1.5);
     }}
     #standings-list li {{
-      font-family: 'Montserrat', 'Arial Black', sans-serif;
-      font-size: 18px;
-      margin-bottom: 6px;
-      transition: background 0.3s, color 0.3s;
-      border-radius: 8px;
-      padding: 1px 4px 1px 0;
-      box-shadow: none;
+        font-family: 'Montserrat', 'Arial Black', sans-serif;
+        font-size: 18px;
+        margin-bottom: 6px;
+        transition: background 0.3s, color 0.3s;
+        border-radius: 8px;
+        padding: 1px 4px 1px 0;
+        box-shadow: none;
     }}
     #standings-list li:first-child {{
-      border-top-left-radius: 20px; border-top-right-radius: 20px;
+        border-top-left-radius: 20px; border-top-right-radius: 20px;
     }}
     #standings-list li:last-child {{
-      border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;
+        border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;
     }}
     </style>
     <div style='display: flex; justify-content: center; align-items: flex-start; gap: 40px;'>
-      <div id='arena-root'></div>
-      <div id='standings-root'>
-        <div>Standings</div>
-        <ol id='standings-list' style='padding-left:0;font-size:16px;list-style-type:none; color:white; font-weight:bold;'></ol>
-      </div>
+        <div id='arena-root'></div>
+        <div id='standings-root'>
+            <div>Standings</div>
+            <ol id='standings-list' style='padding-left:0;font-size:16px;list-style-type:none; color:white; font-weight:bold;'></ol>
+        </div>
     </div>
     <script>
     window.addEventListener('DOMContentLoaded', function() {{
@@ -84,12 +84,26 @@ def html_circle_layout_js(names):
         arena.style.border = '6px solid #3df0fa';
         document.getElementById('arena-root').appendChild(arena);
 
-        let activeNames = NAMES.map((name, idx) => ({{ 
-            name, 
-            angle: (2 * Math.PI * idx) / NAMES.length + Math.random(),
-            speed: (Math.random() * 0.025 + 0.01) * (Math.random() < 0.5 ? 1 : -1), 
-            el: null,
-        }}));
+        let activeNames = NAMES.map((name, idx) => {{
+            // Distribute positions evenly in a circle
+            let theta = (2 * Math.PI * idx) / NAMES.length;
+            let px = SIZE/2 + Math.cos(theta) * (RADIUS * 0.72);
+            let py = SIZE/2 + Math.sin(theta) * (RADIUS * 0.72);
+            // Give each a random velocity
+            let speed = Math.random() * 1.2 + 0.7; // pixels per frame
+            let dir = Math.random() * 2 * Math.PI;
+            let vx = Math.cos(dir) * speed;
+            let vy = Math.sin(dir) * speed;
+            return {{
+                name,
+                x: px,
+                y: py,
+                vx: vx,
+                vy: vy,
+                el: null,
+                eliminated: false
+            }};
+        }});
 
         let running = true;
         let standings = [];
@@ -110,20 +124,15 @@ def html_circle_layout_js(names):
 
         function renderNames() {{
             arena.innerHTML = '';
-            activeNames.forEach((obj, i) => {{
+            activeNames.forEach(obj => {{
                 if (obj.eliminated) return;
-                // Add sporadic 'wiggle' to make the motion more fun
-                let wiggleR = (Math.random() - 0.5) * 34; // +/- 17px radius wiggle
-                let angleWiggle = (Math.random() - 0.5) * 0.35; // +/- ~20deg angle
-                let posRadius = RADIUS + wiggleR;
-                let posAngle = obj.angle + angleWiggle;
                 let el = document.createElement('div');
                 obj.el = el;
                 el.innerText = obj.name;
                 el.style.position = 'absolute';
                 el.style.fontWeight = '900';
-                el.style.left = (SIZE / 2 + Math.cos(posAngle) * posRadius) + 'px';
-                el.style.top = (SIZE / 2 + Math.sin(posAngle) * posRadius) + 'px';
+                el.style.left = obj.x + 'px';
+                el.style.top = obj.y + 'px';
                 el.style.transform = 'translate(-50%,-50%) scale(1)';
                 el.style.padding = '11px 20px';
                 el.style.borderRadius = '99px';
@@ -179,14 +188,32 @@ def html_circle_layout_js(names):
         function animate() {{
             activeNames.forEach(obj => {{
                 if (!obj.eliminated) {{
-                    obj.angle += obj.speed;
-                    if (obj.angle > 2 * Math.PI) obj.angle -= 2 * Math.PI;
-                    if (obj.angle < 0) obj.angle += 2 * Math.PI;
+                    // Move by velocity
+                    obj.x += obj.vx;
+                    obj.y += obj.vy;
+                    // Bounce off edge of arena (circle)
+                    let cx = SIZE/2, cy = SIZE/2;
+                    let dx = obj.x - cx, dy = obj.y - cy;
+                    let dist = Math.sqrt(dx*dx + dy*dy);
+                    if (dist > RADIUS - 24) {{
+                        // Bounce: reflect velocity and move inside boundary
+                        let normX = dx / dist, normY = dy / dist;
+                        let dot = obj.vx * normX + obj.vy * normY;
+                        obj.vx -= 2 * dot * normX;
+                        obj.vy -= 2 * dot * normY;
+                        // Dampening for more realism
+                        obj.vx *= 0.92;
+                        obj.vy *= 0.92;
+                        // Bring just inside edge
+                        obj.x = cx + normX * (RADIUS - 25);
+                        obj.y = cy + normY * (RADIUS - 25);
+                    }}
                 }}
             }});
             renderNames();
             if (running) requestAnimationFrame(animate);
         }}
+
         animate();
 
         function eliminateNext() {{
@@ -209,7 +236,7 @@ def html_circle_layout_js(names):
             const toEliminate = stillIn[Math.floor(Math.random() * stillIn.length)];
             toEliminate.eliminated = true;
             toEliminate.el.style.transition = 'opacity 1.2s, filter 1.3s, left 0.9s, top 0.9s, transform 0.6s cubic-bezier(.23,1.5,.32,1)';
-            const flyAngle = toEliminate.angle;
+            const flyAngle = Math.atan2(toEliminate.y - SIZE/2, toEliminate.x - SIZE/2);
             toEliminate.el.style.left = (SIZE / 2 + Math.cos(flyAngle) * (RADIUS + 110)) + 'px';
             toEliminate.el.style.top = (SIZE / 2 + Math.sin(flyAngle) * (RADIUS + 110)) + 'px';
             toEliminate.el.style.opacity = 0;
