@@ -15,7 +15,7 @@ def html_circle_layout_js(names):
       <div id='arena-root'></div>
       <div id='standings-root' style='min-width: 160px;'>
         <div style='font-weight:bold;font-size:18px;margin-bottom:12px;color:white;text-shadow:0 2px 6px #222;'>Standings</div>
-        <ol id='standings-list' style='padding-left:22px;font-size:16px;list-style-position:inside; color:white; font-weight:bold;'></ol>
+        <ol id='standings-list' style='padding-left:0;font-size:16px;list-style-type:none; color:white; font-weight:bold;'></ol>
       </div>
     </div>
     <script>
@@ -75,19 +75,27 @@ def html_circle_layout_js(names):
     }}
 
     function renderStandings() {{
-        const ol = document.getElementById('standings-list');
-        ol.innerHTML = '';
-        const total = NAMES.length;
-        // Inverse order: first out at top (10th), winner at bottom (1st)
-        standings.forEach((name, idx) => {{
-            const li = document.createElement('li');
-            // Numbering: first out gets total, counts down to 1 for the winner
-            li.innerText = (standings.length - idx) + '. ' + name;
-            li.style.marginBottom = '4px';
-            li.style.fontWeight = 'bold';
-            li.style.color = 'white';
-            ol.appendChild(li);
-        }});
+    const ol = document.getElementById('standings-list');
+    ol.innerHTML = '';
+    ol.style.listStyleType = 'none';
+    ol.style.paddingLeft = '0';
+    const total = NAMES.length;
+    // Inverse order: first out at top (10th), winner at bottom (1st)
+    standings.forEach((name, idx) => {{
+        const li = document.createElement('li');
+        let placeNum = standings.length - idx;
+        let placeStr = (
+            placeNum === 1 ? '1st' :
+            placeNum === 2 ? '2nd' :
+            placeNum === 3 ? '3rd' : placeNum + 'th'
+        );
+        li.innerText = placeStr + ' ' + name;
+        li.style.marginBottom = '4px';
+        li.style.fontWeight = 'bold';
+        li.style.color = 'white';
+        ol.appendChild(li);
+    }});
+}});
     }}
 
     renderNames();
