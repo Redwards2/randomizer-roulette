@@ -58,6 +58,7 @@ def html_circle_layout_js(names):
     renderNames();
     // Animate movement
     let running = true;
+let standings = [];
     function animate() {{
         activeNames.forEach(obj => {{
             if (!obj.eliminated) {{
@@ -75,11 +76,14 @@ def html_circle_layout_js(names):
         const stillIn = activeNames.filter(n => !n.eliminated);
         if (stillIn.length <= 1) {{
             // Winner: highlight & stop animation
-            if (stillIn[0]) {{
+            if (stillIn[0]) {
+                standings.unshift(stillIn[0].name); // Winner gets 1st place
                 stillIn[0].el.style.background = '#4ee44e';
                 stillIn[0].el.style.boxShadow = '0 0 16px #13c913, 1px 1px 4px rgba(0,0,0,0.22)';
                 stillIn[0].el.style.filter = 'drop-shadow(0 0 6px #bfffbb)';
-            }}
+            }
+            // Save standings in browser storage
+            window.localStorage.setItem('last_man_standing_results', JSON.stringify(standings));
             running = false;
             return;
         }}
@@ -93,9 +97,10 @@ def html_circle_layout_js(names):
         toEliminate.el.style.top = (SIZE / 2 + Math.sin(flyAngle) * (RADIUS + 110)) + 'px';
         toEliminate.el.style.opacity = 0;
         toEliminate.el.style.filter = 'blur(6px)';
-        setTimeout(() => {{
+        standings.unshift(toEliminate.name); // Add to standings in reverse order
+        setTimeout(() => {
             toEliminate.el && toEliminate.el.remove();
-        }}, 1100);
+        }, 1100);
         setTimeout(eliminateNext, ELIMINATION_INTERVAL);
     }}
     setTimeout(eliminateNext, ELIMINATION_INTERVAL * 1.5); // wait a moment before first elimination
@@ -104,6 +109,41 @@ def html_circle_layout_js(names):
     components.html(html_code, height=size + 40)
 # END
 
+# START: Standings Button and Results Table
+import pandas as pd
+
+def show_standings():
+    standings_code = """
+    <script>
+    const result = window.localStorage.getItem('last_man_standing_results');
+    if (result) {
+        const parsed = JSON.parse(result);
+        const text = parsed.map((name, i) => `${i+1}. ${name}`).join('
+');
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.id = 'standings-result';
+        input.value = text;
+        document.body.appendChild(input);
+    }
+    </script>
+    """
+    components.html(standings_code, height=0)
+    st.info("If results do not appear instantly, click 'Show Results' again after a few seconds.")
+    # JS can't push directly to Python, so user may need to click twice
+    # Try to read the standings via Streamlit's experimental_get_query_params (or from st.session_state in the future)
+    # Here, simply provide a text input for manual paste if automation doesn't work
+    value = st.text_area("Paste results here if not auto-filled:")
+    if value:
+        lines = value.strip().split('
+')
+        st.subheader("Final Standings:")
+        df = pd.DataFrame([l.split('. ', 1) for l in lines if '. ' in l], columns=["Place", "Name"])
+        st.dataframe(df)
+
+if st.button("Show Results"):
+    show_standings()
+# END
 # START: Streamlit setup
 st.set_page_config(page_title="Last Man Standing", layout="centered")
 st.title("🎯 Last Man Standing - Randomizer")
