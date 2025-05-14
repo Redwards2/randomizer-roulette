@@ -23,7 +23,10 @@ def html_circle_layout_js(names):
         const NAMES = {names_js};
         const SIZE = {size};
         const RADIUS = {radius};
-        const ELIMINATION_INTERVAL = 1600; // ms
+        function randomDelay() {{
+    // Returns a random delay in milliseconds between 5000 and 10000
+    return Math.floor(Math.random() * 5000) + 5000;
+}}
 
         // Dark background behind standings
         document.getElementById('standings-root').style.background = "#222";
@@ -143,9 +146,9 @@ def html_circle_layout_js(names):
             setTimeout(() => {{
                 toEliminate.el && toEliminate.el.remove();
             }}, 1100);
-            setTimeout(eliminateNext, ELIMINATION_INTERVAL);
+            setTimeout(eliminateNext, randomDelay());
         }}
-        setTimeout(eliminateNext, ELIMINATION_INTERVAL * 1.5);
+        setTimeout(eliminateNext, randomDelay());
 
     }});
     </script>
