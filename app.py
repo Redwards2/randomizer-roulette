@@ -35,19 +35,19 @@ def html_circle_layout_js(names):
     arena.style.boxShadow = '0 0 30px #ddd';
     document.getElementById('arena-root').appendChild(arena);
 
-    let activeNames = NAMES.map((name, idx) => ({
-        name,
+    let activeNames = NAMES.map((name, idx) => ({{ 
+        name, 
         angle: (2 * Math.PI * idx) / NAMES.length + Math.random(),
-        speed: (Math.random() * 0.025 + 0.01) * (Math.random() < 0.5 ? 1 : -1),
+        speed: (Math.random() * 0.025 + 0.01) * (Math.random() < 0.5 ? 1 : -1), 
         el: null,
-    }));
+    }}));
 
     let running = true;
     let standings = [];
 
-    function renderNames() {
+    function renderNames() {{
         arena.innerHTML = '';
-        activeNames.forEach((obj, i) => {
+        activeNames.forEach((obj, i) => {{
             if (obj.eliminated) return;
             let el = document.createElement('div');
             obj.el = el;
@@ -65,53 +65,53 @@ def html_circle_layout_js(names):
             el.style.zIndex = 3;
             el.style.userSelect = 'none';
             arena.appendChild(el);
-        });
-    }
+        }});
+    }}
 
-    function renderStandings() {
+    function renderStandings() {{
         const ol = document.getElementById('standings-list');
         ol.innerHTML = '';
         const total = NAMES.length;
-        standings.forEach((name, idx) => {
+        standings.forEach((name, idx) => {{
             const li = document.createElement('li');
             li.innerText = name + ' (' + (total - idx) + ')';
             li.style.marginBottom = '4px';
             li.style.fontWeight = idx === 0 ? 'bold' : 'normal';
             ol.appendChild(li);
-        });
-    }
+        }});
+    }}
 
     renderNames();
     renderStandings();
 
-    function animate() {
-        activeNames.forEach(obj => {
-            if (!obj.eliminated) {
+    function animate() {{
+        activeNames.forEach(obj => {{
+            if (!obj.eliminated) {{
                 obj.angle += obj.speed;
                 if (obj.angle > 2 * Math.PI) obj.angle -= 2 * Math.PI;
                 if (obj.angle < 0) obj.angle += 2 * Math.PI;
-            }
-        });
+            }}
+        }});
         renderNames();
         if (running) requestAnimationFrame(animate);
-    }
+    }}
     animate();
 
-    function eliminateNext() {
+    function eliminateNext() {{
         const stillIn = activeNames.filter(n => !n.eliminated);
-        if (stillIn.length <= 1) {
+        if (stillIn.length <= 1) {{
             // Winner: highlight & stop animation
-            if (stillIn[0]) {
+            if (stillIn[0]) {{
                 standings.unshift(stillIn[0].name); // Winner gets 1st place
                 stillIn[0].el.style.background = '#4ee44e';
                 stillIn[0].el.style.boxShadow = '0 0 16px #13c913, 1px 1px 4px rgba(0,0,0,0.22)';
                 stillIn[0].el.style.filter = 'drop-shadow(0 0 6px #bfffbb)';
-            }
+            }}
             renderStandings();
             running = false;
             window.localStorage.setItem('last_man_standing_results', JSON.stringify(standings));
             return;
-        }
+        }}
         // Pick random to eliminate
         const toEliminate = stillIn[Math.floor(Math.random() * stillIn.length)];
         toEliminate.eliminated = true;
@@ -124,11 +124,11 @@ def html_circle_layout_js(names):
         toEliminate.el.style.filter = 'blur(6px)';
         standings.unshift(toEliminate.name); // Add eliminated to standings (reverse order)
         renderStandings();
-        setTimeout(() => {
+        setTimeout(() => {{
             toEliminate.el && toEliminate.el.remove();
-        }, 1100);
+        }}, 1100);
         setTimeout(eliminateNext, ELIMINATION_INTERVAL);
-    }
+    }}
     setTimeout(eliminateNext, ELIMINATION_INTERVAL * 1.5); // wait a moment before first elimination
     </script>
     """
