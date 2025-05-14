@@ -19,7 +19,9 @@ def html_circle_layout(names, eliminated_name=None):
             bg_color = "#ff4d4d"
             # END
         else:
-            animation_class = "dvd-float"
+            # Add a randomized animation delay to desync float animations
+            delay = round(random.uniform(0, 2), 2)
+            animation_class = f"dvd-float float-delay-{i}"
             bg_color = "#ffeb3b"
 
         angle = 2 * 3.14159 * i / len(names)
@@ -37,6 +39,7 @@ def html_circle_layout(names, eliminated_name=None):
                 font-weight: bold;
                 box-shadow: 1px 1px 4px rgba(0,0,0,0.3);
                 white-space: nowrap;
+                animation-delay: {delay}s;
             ">
                 {name}
             </div>
@@ -66,7 +69,10 @@ def html_circle_layout(names, eliminated_name=None):
     100% {{ transform: translate(-50%, -50%) translate(0px, 0px); }}
 }}
 .dvd-float {{
-    animation: dvd-bounce 3s infinite ease-in-out;
+    animation-name: dvd-bounce;
+    animation-duration: 3s;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
 }}
 </style>
 <div style="position: relative; width: {size}px; height: {size}px; margin: auto; background: white; border-radius: 50%; overflow: hidden;">
