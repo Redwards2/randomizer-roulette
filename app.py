@@ -112,7 +112,7 @@ def html_circle_layout_js(names):
 # START: Standings Button and Results Table
 import pandas as pd
 
-ddef show_standings():
+def show_standings():
     standings_code = """
     <script>
     const result = window.localStorage.getItem('last_man_standing_results');
