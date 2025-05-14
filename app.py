@@ -91,7 +91,7 @@ def html_circle_layout_js(names):
             el: null,
         }}));
 
-        let running = True;
+        let running = true;
         let standings = [];
 
         function sparkle(el) {{
