@@ -281,7 +281,7 @@ with st.sidebar:
     st.header("Enter Names")
     names_input = st.text_area("Up to 10 names (one per line)", height=200)
     start = st.button("Start Elimination")
-    st.markdown("**App by [your name or brand]**", unsafe_allow_html=True)
+    st.markdown("**App by [Redwards]**", unsafe_allow_html=True)
 
 names = [name.strip() for name in names_input.split("\n") if name.strip()]
 if len(names) > 10:
