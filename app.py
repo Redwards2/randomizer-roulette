@@ -4,21 +4,105 @@ import math  # Required for angle math
 import streamlit.components.v1 as components
 import time
 
-# START: Circular layout renderer
-
-def html_circle_layout(names, eliminated_name=None):
-    radius = 120
-    size = 300
-    center = size // 2
-
-    divs = ""
-    for i, name in enumerate(names):
-        delay = round(random.uniform(0, 2), 2)  # Always set delay first!
-        if name == eliminated_name:
-            # START: Falling animation class for eliminated name
-            animation_class = "fall-out"
-            bg_color = "#ff4d4d"
-            # END
+# START: Circular layout renderer (JS Version)
+def html_circle_layout_js(names):
+    import json
+    names_js = json.dumps(names)
+    size = 380  # pixels, adjust as needed
+    radius = 145
+    html_code = f'''
+    <div id="arena-root"></div>
+    <script>
+    const NAMES = {names_js};
+    const SIZE = {size};
+    const RADIUS = {radius};
+    const ELIMINATION_INTERVAL = 1600; // ms
+    const arena = document.createElement("div");
+    arena.style.position = "relative";
+    arena.style.width = SIZE + "px";
+    arena.style.height = SIZE + "px";
+    arena.style.margin = "auto";
+    arena.style.background = "white";
+    arena.style.borderRadius = "50%";
+    arena.style.overflow = "hidden";
+    arena.style.boxShadow = "0 0 30px #ddd";
+    document.getElementById("arena-root").appendChild(arena);
+    let activeNames = NAMES.map((name, idx) => ({
+        name,
+        angle: (2 * Math.PI * idx) / NAMES.length + Math.random(), // slightly random
+        speed: (Math.random() * 0.025 + 0.01) * (Math.random() < 0.5 ? 1 : -1), // random direction
+        el: null,
+    }));
+    function renderNames() {
+        arena.innerHTML = '';
+        activeNames.forEach((obj, i) => {
+            if (obj.eliminated) return;
+            let el = document.createElement('div');
+            obj.el = el;
+            el.innerText = obj.name;
+            el.style.position = 'absolute';
+            el.style.fontWeight = 'bold';
+            el.style.left = (SIZE / 2 + Math.cos(obj.angle) * RADIUS) + 'px';
+            el.style.top = (SIZE / 2 + Math.sin(obj.angle) * RADIUS) + 'px';
+            el.style.transform = 'translate(-50%,-50%)';
+            el.style.padding = '7px 13px';
+            el.style.borderRadius = '11px';
+            el.style.background = '#ffeb3b';
+            el.style.boxShadow = '1px 1px 4px rgba(0,0,0,0.28)';
+            el.style.transition = 'opacity 1s, filter 1.2s, left 0.4s, top 0.4s';
+            el.style.zIndex = 3;
+            el.style.userSelect = 'none';
+            arena.appendChild(el);
+        });
+    }
+    renderNames();
+    // Animate movement
+    let running = true;
+    function animate() {
+        activeNames.forEach(obj => {
+            if (!obj.eliminated) {
+                obj.angle += obj.speed;
+                if (obj.angle > 2 * Math.PI) obj.angle -= 2 * Math.PI;
+                if (obj.angle < 0) obj.angle += 2 * Math.PI;
+            }
+        });
+        renderNames();
+        if (running) requestAnimationFrame(animate);
+    }
+    animate();
+    // Eliminate names one by one
+    function eliminateNext() {
+        const stillIn = activeNames.filter(n => !n.eliminated);
+        if (stillIn.length <= 1) {
+            // Winner: highlight & stop animation
+            if (stillIn[0]) {
+                stillIn[0].el.style.background = '#4ee44e';
+                stillIn[0].el.style.boxShadow = '0 0 16px #13c913, 1px 1px 4px rgba(0,0,0,0.22)';
+                stillIn[0].el.style.filter = 'drop-shadow(0 0 6px #bfffbb)';
+            }
+            running = false;
+            return;
+        }
+        // Pick random to eliminate
+        const toEliminate = stillIn[Math.floor(Math.random() * stillIn.length)];
+        toEliminate.eliminated = true;
+        toEliminate.el.style.transition = 'opacity 1s, filter 1.2s, left 0.7s, top 0.7s';
+        // Animate flying out
+        const flyAngle = toEliminate.angle;
+        toEliminate.el.style.left = (SIZE / 2 + Math.cos(flyAngle) * (RADIUS + 110)) + 'px';
+        toEliminate.el.style.top = (SIZE / 2 + Math.sin(flyAngle) * (RADIUS + 110)) + 'px';
+        toEliminate.el.style.opacity = 0;
+        toEliminate.el.style.filter = 'blur(6px)';
+        setTimeout(() => {
+            toEliminate.el && toEliminate.el.remove();
+        }, 1100);
+        setTimeout(eliminateNext, ELIMINATION_INTERVAL);
+    }
+    setTimeout(eliminateNext, ELIMINATION_INTERVAL * 1.5); // wait a moment before first elimination
+    </script>
+    '''
+    components.html(html_code, height=size + 40)
+# END
         else:
             # Add a randomized animation delay to desync float animations
             delay = round(random.uniform(0, 2), 2)
@@ -98,50 +182,8 @@ if len(names) > 10:
     names = names[:10]
 # END
 
-# START: Live elimination with floating animation and bouncing effect
-if "game_active" not in st.session_state:
-    st.session_state.game_active = False
-if "remaining" not in st.session_state:
-    st.session_state.remaining = []
-if "eliminated" not in st.session_state:
-    st.session_state.eliminated = None
-
-params = st.query_params
-
+# START: Live elimination - JS arena version
 if st.button("Start Elimination") and len(names) >= 2:
-    st.session_state.game_active = True
-    st.session_state.remaining = names.copy()
-    st.session_state.eliminated = None
-    st.query_params.clear()
-    st.query_params["step"] = "go"
-    st.rerun()
-
-if st.session_state.game_active and len(st.session_state.remaining) > 2:
-    if st.session_state.eliminated:
-        st.session_state.remaining.remove(st.session_state.eliminated)
-        st.session_state.eliminated = None
-
-    # Pick next name to eliminate
-    st.session_state.eliminated = random.choice(st.session_state.remaining)
-
-    st.markdown(f"💀 **{st.session_state.eliminated}** has been eliminated!")
-    html_circle_layout(st.session_state.remaining, eliminated_name=st.session_state.eliminated)
-
-    # Let animation show, then schedule next rerun
-    time.sleep(1.3)
-    st.query_params.clear()
-    st.query_params["step"] = str(random.randint(1, 10000))
-    st.rerun()
-
-elif st.session_state.game_active and len(st.session_state.remaining) == 2:
-    if st.session_state.eliminated:
-        st.session_state.remaining.remove(st.session_state.eliminated)
-        st.session_state.eliminated = None
-
-    winner = st.session_state.remaining[0]
-    st.balloons()
-    st.success(f"🏆 The last person standing is: **{winner}**")
-    html_circle_layout([winner])
-    st.session_state.game_active = False
-    st.query_params.clear()
+    st.success("Let the chaos begin!")
+    html_circle_layout_js(names)
 # END
