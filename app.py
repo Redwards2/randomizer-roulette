@@ -3,24 +3,27 @@ import random
 import math  # Required for angle math
 import streamlit.components.v1 as components
 import time
-import pandas as pd
-
-st.set_page_config(page_title="Last Man Standing", layout="centered")
-st.title("🎯 Last Man Standing - Randomizer")
 
 # START: Circular layout renderer (JS Version)
 def html_circle_layout_js(names):
     import json
     names_js = json.dumps(names)
-    size = 380  # pixels, adjust as needed
+    size = 380
     radius = 145
     html_code = f"""
-    <div id='arena-root'></div>
+    <div style='display: flex; justify-content: center; align-items: flex-start; gap: 36px;'>
+      <div id='arena-root'></div>
+      <div id='standings-root' style='min-width: 140px;'>
+        <div style='font-weight:bold;font-size:18px;margin-bottom:12px;'>Standings</div>
+        <ol id='standings-list' style='padding-left:22px;font-size:16px;'></ol>
+      </div>
+    </div>
     <script>
     const NAMES = {names_js};
     const SIZE = {size};
     const RADIUS = {radius};
     const ELIMINATION_INTERVAL = 1600; // ms
+
     const arena = document.createElement('div');
     arena.style.position = 'relative';
     arena.style.width = SIZE + 'px';
@@ -31,15 +34,20 @@ def html_circle_layout_js(names):
     arena.style.overflow = 'hidden';
     arena.style.boxShadow = '0 0 30px #ddd';
     document.getElementById('arena-root').appendChild(arena);
-    let activeNames = NAMES.map((name, idx) => ({{
+
+    let activeNames = NAMES.map((name, idx) => ({
         name,
-        angle: (2 * Math.PI * idx) / NAMES.length + Math.random(), // slightly random
-        speed: (Math.random() * 0.025 + 0.01) * (Math.random() < 0.5 ? 1 : -1), // random direction
+        angle: (2 * Math.PI * idx) / NAMES.length + Math.random(),
+        speed: (Math.random() * 0.025 + 0.01) * (Math.random() < 0.5 ? 1 : -1),
         el: null,
-    }}));
-    function renderNames() {{
+    }));
+
+    let running = true;
+    let standings = [];
+
+    function renderNames() {
         arena.innerHTML = '';
-        activeNames.forEach((obj, i) => {{
+        activeNames.forEach((obj, i) => {
             if (obj.eliminated) return;
             let el = document.createElement('div');
             obj.el = el;
@@ -57,40 +65,53 @@ def html_circle_layout_js(names):
             el.style.zIndex = 3;
             el.style.userSelect = 'none';
             arena.appendChild(el);
-        }});
-    }}
+        });
+    }
+
+    function renderStandings() {
+        const ol = document.getElementById('standings-list');
+        ol.innerHTML = '';
+        const total = NAMES.length;
+        standings.forEach((name, idx) => {
+            const li = document.createElement('li');
+            li.innerText = name + ' (' + (total - idx) + ')';
+            li.style.marginBottom = '4px';
+            li.style.fontWeight = idx === 0 ? 'bold' : 'normal';
+            ol.appendChild(li);
+        });
+    }
+
     renderNames();
-    // Animate movement
-    let running = true;
-    let standings = [];
-    function animate() {{
-        activeNames.forEach(obj => {{
-            if (!obj.eliminated) {{
+    renderStandings();
+
+    function animate() {
+        activeNames.forEach(obj => {
+            if (!obj.eliminated) {
                 obj.angle += obj.speed;
                 if (obj.angle > 2 * Math.PI) obj.angle -= 2 * Math.PI;
                 if (obj.angle < 0) obj.angle += 2 * Math.PI;
-            }}
-        }});
+            }
+        });
         renderNames();
         if (running) requestAnimationFrame(animate);
-    }}
+    }
     animate();
-    // Eliminate names one by one
-    function eliminateNext() {{
+
+    function eliminateNext() {
         const stillIn = activeNames.filter(n => !n.eliminated);
-        if (stillIn.length <= 1) {{
+        if (stillIn.length <= 1) {
             // Winner: highlight & stop animation
-            if (stillIn[0]) {{
+            if (stillIn[0]) {
                 standings.unshift(stillIn[0].name); // Winner gets 1st place
                 stillIn[0].el.style.background = '#4ee44e';
                 stillIn[0].el.style.boxShadow = '0 0 16px #13c913, 1px 1px 4px rgba(0,0,0,0.22)';
                 stillIn[0].el.style.filter = 'drop-shadow(0 0 6px #bfffbb)';
-            }}
-            // Save standings in browser storage
-            window.localStorage.setItem('last_man_standing_results', JSON.stringify(standings));
+            }
+            renderStandings();
             running = false;
+            window.localStorage.setItem('last_man_standing_results', JSON.stringify(standings));
             return;
-        }}
+        }
         // Pick random to eliminate
         const toEliminate = stillIn[Math.floor(Math.random() * stillIn.length)];
         toEliminate.eliminated = true;
@@ -101,46 +122,23 @@ def html_circle_layout_js(names):
         toEliminate.el.style.top = (SIZE / 2 + Math.sin(flyAngle) * (RADIUS + 110)) + 'px';
         toEliminate.el.style.opacity = 0;
         toEliminate.el.style.filter = 'blur(6px)';
-        standings.unshift(toEliminate.name); // Add to standings in reverse order
-        setTimeout(() => {{
+        standings.unshift(toEliminate.name); // Add eliminated to standings (reverse order)
+        renderStandings();
+        setTimeout(() => {
             toEliminate.el && toEliminate.el.remove();
-        }}, 1100);
+        }, 1100);
         setTimeout(eliminateNext, ELIMINATION_INTERVAL);
-    }}
+    }
     setTimeout(eliminateNext, ELIMINATION_INTERVAL * 1.5); // wait a moment before first elimination
     </script>
     """
     components.html(html_code, height=size + 40)
 # END
 
-# START: Standings Button and Results Table
 
-def show_standings():
-    standings_code = """
-    <script>
-    const result = window.localStorage.getItem('last_man_standing_results');
-    if (result) {
-        const parsed = JSON.parse(result);
-        const text = parsed.map((name, i) => `${i+1}. ${name}`).join('\\n');
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.id = 'standings-result';
-        input.value = text;
-        document.body.appendChild(input);
-    }
-    </script>
-    """
-    components.html(standings_code, height=0)
-    st.info("If results do not appear instantly, click 'Show Results' again after a few seconds.")
-    value = st.text_area("Paste results here if not auto-filled:")
-    if value:
-        lines = value.strip().split('\n')
-        st.subheader("Final Standings:")
-        df = pd.DataFrame([l.split('. ', 1) for l in lines if '. ' in l], columns=["Place", "Name"])
-        st.dataframe(df)
-
-if st.button("Show Results"):
-    show_standings()
+# START: Streamlit setup
+st.set_page_config(page_title="Last Man Standing", layout="centered")
+st.title("🎯 Last Man Standing - Randomizer")
 # END
 
 # START: Name entry
