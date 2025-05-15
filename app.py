@@ -147,11 +147,10 @@ def html_circle_layout_js(names):
         }}
 
         function renderNames() {{
-            // Only clear the arena of children that aren't currently animating out
+            // Only keep popping (mid-pop-out) elements in the DOM until their animation is done
             const elementsToKeep = [];
             activeNames.forEach(obj => {{
-                // If element exists and is animating out, keep it for now
-                if (obj.el && obj.el.popping) {{
+                if (obj.el && obj.popping && !obj.removed) {{
                     elementsToKeep.push(obj.el);
                 }}
             }});
@@ -159,7 +158,9 @@ def html_circle_layout_js(names):
             elementsToKeep.forEach(el => arena.appendChild(el));
         
             activeNames.forEach(obj => {{
-                if (obj.eliminated || obj.removed) return;
+                // Only render if not eliminated and not removed (popping elements are kept by above)
+                if (obj.removed) return;
+                if (obj.eliminated) return; // eliminated means it's popping right now (will be kept by elementsToKeep)
                 let el = document.createElement('div');
                 obj.el = el;
                 el.innerHTML = `<div style='font-size:15px;font-weight:900;margin-bottom:1px;'>${{obj.name}}</div><div style='font-size:32px;line-height:1;'>${{obj.emoji}}</div>`;
