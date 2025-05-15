@@ -147,40 +147,41 @@ def html_circle_layout_js(names):
         }}
 
         function renderNames() {{
-            // Only keep elements that are still popping (eliminated but not removed)
-            const elementsToKeep = [];
-            activeNames.forEach(obj => {{
-                // Keep all objects that are not removed (active or popping)
-                if (obj.el && !obj.removed) {{
-                    elementsToKeep.push(obj.el);
-                }}
-            }});
+            // Only keep DOM nodes for all objects that aren't removed
             arena.innerHTML = '';
-            elementsToKeep.forEach(el => arena.appendChild(el));
-        
             activeNames.forEach(obj => {{
-                // Only create new DOM node for active (not eliminated & not removed) objects
-                if (obj.eliminated || obj.removed) return;
-                let el = document.createElement('div');
-                obj.el = el;
-                el.innerHTML = `<div style='font-size:15px;font-weight:900;margin-bottom:1px;'>${{obj.name}}</div><div style='font-size:32px;line-height:1;'>${{obj.emoji}}</div>`;
-                el.style.position = 'absolute';
-                el.style.fontWeight = '900';
-                el.style.left = obj.x + 'px';
-                el.style.top = obj.y + 'px';
-                el.style.transform = 'translate(-50%,-50%) scale(1)';
-                el.style.padding = '11px 20px';
-                el.style.borderRadius = '99px';
-                el.style.background = 'linear-gradient(95deg, #f1f7b4 0%, #faf8e4 80%)';
-                el.style.boxShadow = '0 3px 16px #f1f6bb88, 0 1px 8px #1b87f755';
-                el.style.border = '2.8px solid #20e7ef';
-                el.style.transition = 'opacity 1.2s, filter 1.3s, left 0.6s, top 0.6s, transform 0.3s cubic-bezier(.23,1.5,.32,1)';
-                el.style.fontFamily = 'Montserrat, Arial Black, sans-serif';
-                el.style.color = '#33394b';
-                el.style.textShadow = '0 2px 12px #fffcc960, 0 1px 1px #fff';
-                el.style.zIndex = 3;
-                el.style.userSelect = 'none';
-                arena.appendChild(el);
+                if (obj.removed) return; // Skip removed
+        
+                // Only create the DOM node once per object
+                if (!obj.el) {{
+                    let el = document.createElement('div');
+                    obj.el = el;
+                    el.innerHTML = `<div style='font-size:15px;font-weight:900;margin-bottom:1px;'>${{obj.name}}</div><div style='font-size:32px;line-height:1;'>${{obj.emoji}}</div>`;
+                    el.style.position = 'absolute';
+                    el.style.fontWeight = '900';
+                    el.style.left = obj.x + 'px';
+                    el.style.top = obj.y + 'px';
+                    el.style.transform = 'translate(-50%,-50%) scale(1)';
+                    el.style.padding = '11px 20px';
+                    el.style.borderRadius = '99px';
+                    el.style.background = 'linear-gradient(95deg, #f1f7b4 0%, #faf8e4 80%)';
+                    el.style.boxShadow = '0 3px 16px #f1f6bb88, 0 1px 8px #1b87f755';
+                    el.style.border = '2.8px solid #20e7ef';
+                    el.style.transition = 'opacity 1.2s, filter 1.3s, left 0.6s, top 0.6s, transform 0.3s cubic-bezier(.23,1.5,.32,1)';
+                    el.style.fontFamily = 'Montserrat, Arial Black, sans-serif';
+                    el.style.color = '#33394b';
+                    el.style.textShadow = '0 2px 12px #fffcc960, 0 1px 1px #fff';
+                    el.style.zIndex = 3;
+                    el.style.userSelect = 'none';
+                }}
+        
+                // For eliminated bubbles, stop updating their position so the animation can play
+                if (!obj.eliminated) {{
+                    obj.el.style.left = obj.x + 'px';
+                    obj.el.style.top = obj.y + 'px';
+                }}
+        
+                arena.appendChild(obj.el);
             }});
         }}
 
