@@ -10,7 +10,7 @@ def html_circle_layout_js(names):
     names_js = json.dumps(names)
     size = 400
     radius = 155
-    html_code = f"""
+    html_code = f'''
     <style>
     body, .stApp {{
         background: linear-gradient(135deg, #232946 0%, #00cfff 100%) !important;
@@ -76,7 +76,7 @@ def html_circle_layout_js(names):
           opacity: 0;
           filter: blur(12px) brightness(2);
       }}
-  }}
+    }}
     </style>
     <div style='display: flex; justify-content: center; align-items: flex-start; gap: 40px;'>
         <div id='arena-root'></div>
@@ -141,13 +141,23 @@ def html_circle_layout_js(names):
             s.style.transform = 'translate(-50%,-50%)';
             s.style.borderRadius = '50%';
             s.style.zIndex = 6;
-            s.innerHTML = '<svg width=\"36\" height=\"36\"><circle cx=\"18\" cy=\"18\" r=\"14\" fill=\"none\" stroke=\"#ffe52e\" stroke-width=\"4\" opacity=\"0.62\"/><circle cx=\"18\" cy=\"18\" r=\"10\" fill=\"#fffdbb99\" opacity=\"0.45\"/></svg>';
+            s.innerHTML = '<svg width="36" height="36"><circle cx="18" cy="18" r="14" fill="none" stroke="#ffe52e" stroke-width="4" opacity="0.62"/><circle cx="18" cy="18" r="10" fill="#fffdbb99" opacity="0.45"/></svg>';
             el.appendChild(s);
             setTimeout(() => s.remove(), 900);
         }}
 
         function renderNames() {{
+            // Only clear the arena of children that aren't currently animating out
+            const elementsToKeep = [];
+            activeNames.forEach(obj => {{
+                // If element exists and is animating out, keep it for now
+                if (obj.el && obj.el.popping) {{
+                    elementsToKeep.push(obj.el);
+                }}
+            }});
             arena.innerHTML = '';
+            elementsToKeep.forEach(el => arena.appendChild(el));
+        
             activeNames.forEach(obj => {{
                 if (obj.eliminated) return;
                 let el = document.createElement('div');
@@ -261,6 +271,7 @@ def html_circle_layout_js(names):
             toEliminate.eliminated = true;
             toEliminate.el.style.animation = 'pop-out 1.1s cubic-bezier(.23,1.5,.32,1) forwards';
             toEliminate.el.style.zIndex = 9;
+            toEliminate.el.popping = true;
             sparkle(toEliminate.el);
             standings.push(toEliminate.name);
             renderStandings();
@@ -288,7 +299,7 @@ def html_circle_layout_js(names):
         setTimeout(eliminateNext, randomDelay());
     }});
     </script>
-    """
+    '''
     components.html(html_code, height=size + 60)
 # END
 
@@ -317,7 +328,7 @@ if start:
         st.markdown(
             "<div style='text-align:center; color:#22711A; font-size:1.35rem; font-weight:bold; background:#e6ffed; border-radius:8px; padding:0.8em 0; margin-bottom:10px;'>"
             "May the odds be ever in your Favor!"
-            "</div>",
+            "</div>
             unsafe_allow_html=True,
         )
     else:
