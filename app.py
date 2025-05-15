@@ -48,7 +48,7 @@ st.markdown(
     }}
     /* Make disabled button text always visible and legible */
     button:disabled, .stButton>button[disabled] {{
-        color: #222 !important;      /* Change to white (#fff) for dark sidebar, or #222 for light button */
+        color: #000 !important;      /* Change to white (#fff) for dark sidebar, or #222 for light button */
         opacity: 0.7 !important;     /* Make it more opaque */
         background: #eee !important; /* Keep the lighter background */
         border: 1.5px solid #bbb !important;
