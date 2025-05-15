@@ -328,7 +328,7 @@ if start:
         st.markdown(
             "<div style='text-align:center; color:#22711A; font-size:1.35rem; font-weight:bold; background:#e6ffed; border-radius:8px; padding:0.8em 0; margin-bottom:10px;'>"
             "May the odds be ever in your Favor!"
-            "</div>
+            "</div>",
             unsafe_allow_html=True,
         )
     else:
