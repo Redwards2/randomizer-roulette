@@ -4,6 +4,8 @@ import math  # Required for angle math
 import streamlit.components.v1 as components
 import time
 
+st.set_page_config(page_title="Last Man Standing", layout="centered")
+
 st.markdown(
     """
     <style>
@@ -367,7 +369,6 @@ def html_circle_layout_js(names):
 # END
 
 # SIDEBAR INPUT ONLY VERSION
-st.set_page_config(page_title="Last Man Standing", layout="centered")
 st.title("🎯 Last Man Standing - Randomizer")
 
 with st.sidebar:
