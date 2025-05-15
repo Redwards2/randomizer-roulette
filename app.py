@@ -147,10 +147,11 @@ def html_circle_layout_js(names):
         }}
 
         function renderNames() {{
-            // Only keep popping (mid-pop-out) elements in the DOM until their animation is done
+            // Only keep elements that are still popping (eliminated but not removed)
             const elementsToKeep = [];
             activeNames.forEach(obj => {{
-                if (obj.el && obj.popping && !obj.removed) {{
+                // Keep all objects that are not removed (active or popping)
+                if (obj.el && !obj.removed) {{
                     elementsToKeep.push(obj.el);
                 }}
             }});
@@ -158,7 +159,8 @@ def html_circle_layout_js(names):
             elementsToKeep.forEach(el => arena.appendChild(el));
         
             activeNames.forEach(obj => {{
-                if (obj.removed || obj.eliminated) return; // Only create new elements for active, non-eliminated
+                // Only create new DOM node for active (not eliminated & not removed) objects
+                if (obj.eliminated || obj.removed) return;
                 let el = document.createElement('div');
                 obj.el = el;
                 el.innerHTML = `<div style='font-size:15px;font-weight:900;margin-bottom:1px;'>${{obj.name}}</div><div style='font-size:32px;line-height:1;'>${{obj.emoji}}</div>`;
