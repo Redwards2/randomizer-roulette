@@ -371,7 +371,7 @@ def html_circle_layout_js(names):
 # END
 
 # SIDEBAR INPUT ONLY VERSION
-st.title("🎯 Last Man Standing - Randomizer")
+st.title("🎯 Randomizer Roullette")
 
 with st.sidebar:
     st.header("Enter Names")
