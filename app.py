@@ -84,27 +84,28 @@ def html_circle_layout_js(names):
         arena.style.border = '6px solid #3df0fa';
         document.getElementById('arena-root').appendChild(arena);
 
-        let activeNames = NAMES.map((name, idx) => {{
-            // Distribute positions evenly in a circle
-            let theta = (2 * Math.PI * idx) / NAMES.length;
-            let px = SIZE/2 + Math.cos(theta) * (RADIUS * 0.72);
-            let py = SIZE/2 + Math.sin(theta) * (RADIUS * 0.72);
-            // Give each a random velocity
-            let speed = Math.random() * 2.4 + 1.2; // UNIQUE: speed now between 1.2 and 3.6 px per frame (double original)
-            let dir = Math.random() * 2 * Math.PI;
-            let vx = Math.cos(dir) * speed;
-            let vy = Math.sin(dir) * speed;
-
-            return {{
-                name,
-                x: px,
-                y: py,
-                vx: vx,
-                vy: vy,
-                el: null,
-                eliminated: false
-            }};
-        }});
+        const emojis = ["🎲","😎","🦄","🐲","👾","🦸‍♂️","🧙‍♂️","🦖","🤠","👽","🐸","👻","🤖","🐼","🐧","🦊","🐻","🦕","🧟","👩‍🚀"];
+let activeNames = NAMES.map((name, idx) => {
+    let theta = (2 * Math.PI * idx) / NAMES.length;
+    let px = SIZE/2 + Math.cos(theta) * (RADIUS * 0.72);
+    let py = SIZE/2 + Math.sin(theta) * (RADIUS * 0.72);
+    let speed = Math.random() * 2.4 + 1.2;
+    let dir = Math.random() * 2 * Math.PI;
+    let vx = Math.cos(dir) * speed;
+    let vy = Math.sin(dir) * speed;
+    // Assign a random emoji to each name
+    let emoji = emojis[Math.floor(Math.random() * emojis.length)];
+    return {
+        name,
+        emoji,
+        x: px,
+        y: py,
+        vx: vx,
+        vy: vy,
+        el: null,
+        eliminated: false
+    };
+});
 
         let running = true;
         let standings = [];
@@ -129,7 +130,7 @@ def html_circle_layout_js(names):
                 if (obj.eliminated) return;
                 let el = document.createElement('div');
                 obj.el = el;
-                el.innerText = obj.name;
+                el.innerHTML = `<div style='font-size:15px;font-weight:900;margin-bottom:1px;'>${obj.name}</div><div style='font-size:32px;line-height:1;'>${obj.emoji}</div>`;
                 el.style.position = 'absolute';
                 el.style.fontWeight = '900';
                 el.style.left = obj.x + 'px';
