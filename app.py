@@ -85,7 +85,7 @@ def html_circle_layout_js(names):
         document.getElementById('arena-root').appendChild(arena);
 
         const emojis = ["🎲","😎","🦄","🐲","👾","🦸‍♂️","🧙‍♂️","🦖","🤠","👽","🐸","👻","🤖","🐼","🐧","🦊","🐻","🦕","🧟","👩‍🚀"];
-        let activeNames = NAMES.map((name, idx) => {
+        let activeNames = NAMES.map((name, idx) => {{
             let theta = (2 * Math.PI * idx) / NAMES.length;
             let px = SIZE/2 + Math.cos(theta) * (RADIUS * 0.72);
             let py = SIZE/2 + Math.sin(theta) * (RADIUS * 0.72);
@@ -95,7 +95,7 @@ def html_circle_layout_js(names):
             let vy = Math.sin(dir) * speed;
             // Assign a random emoji to each name
             let emoji = emojis[Math.floor(Math.random() * emojis.length)];
-            return {
+            return {{
                 name,
                 emoji,
                 x: px,
@@ -104,8 +104,8 @@ def html_circle_layout_js(names):
                 vy: vy,
                 el: null,
                 eliminated: false
-            };
-        });
+            }};
+        }});
 
         let running = true;
         let standings = [];
@@ -130,7 +130,7 @@ def html_circle_layout_js(names):
                 if (obj.eliminated) return;
                 let el = document.createElement('div');
                 obj.el = el;
-                el.innerHTML = `<div style='font-size:15px;font-weight:900;margin-bottom:1px;'>${obj.name}</div><div style='font-size:32px;line-height:1;'>${obj.emoji}</div>`;
+                el.innerHTML = `<div style='font-size:15px;font-weight:900;margin-bottom:1px;'>${{obj.name}}</div><div style='font-size:32px;line-height:1;'>${{obj.emoji}}</div>`;
                 el.style.position = 'absolute';
                 el.style.fontWeight = '900';
                 el.style.left = obj.x + 'px';
