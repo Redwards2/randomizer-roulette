@@ -33,17 +33,19 @@ st.markdown(
         padding: 22px 18px 18px 18px !important;
     }
     /* App title styling */
-    h1 {
+    h1 {{
         font-family: 'Montserrat', 'Arial Black', sans-serif;
-        letter-spacing: 2px;
+        letter-spacing: 1.2px;
         font-size: 2.4rem !important;
-        background: linear-gradient(92deg, #3dd8fa 0%, #ffea36 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        filter: brightness(1.5);
-        text-shadow: 0 2px 10px #0bb8ff, 0 1px 1px #111, 0 1px 6px #00cfff90;
+        font-weight: 800;
+        color: #f5f5f7 !important;
+        text-shadow: 0 2px 10px #1a254280, 0 1px 2px #2227;
+        background: none !important;
+        -webkit-background-clip: initial !important;
+        -webkit-text-fill-color: initial !important;
+        filter: none !important;
         text-align: center;
-    }
+    }}
     </style>
     """,
     unsafe_allow_html=True
@@ -67,20 +69,20 @@ def html_circle_layout_js(names):
         box-shadow: 0 4px 24px #0016, 0 0 0 2px #66e4ff88;
         min-width: 175px;
     }}
+       /* Standings header */
     #standings-root > div:first-child {{
         font-family: 'Montserrat', 'Arial Black', sans-serif;
         letter-spacing: 1px;
         font-weight: 800;
         font-size: 23px !important;
         margin-bottom: 18px !important;
-        color: #fff;
-        text-shadow: 0 2px 10px #0bb8ff, 0 0px 1px #111, 0 1px 4px #00cfff90;
+        color: #f5f5f7 !important;
+        background: none !important;
+        -webkit-background-clip: initial !important;
+        -webkit-text-fill-color: initial !important;
+        filter: none !important;
+        text-shadow: 0 2px 6px #0004, 0 1px 1px #0013;
         text-align: center;
-        background: linear-gradient(92deg, #3dd8fa 0%, #ffea36 100%);
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        filter: brightness(1.5);
     }}
     #standings-list li {{
         font-family: 'Montserrat', 'Arial Black', sans-serif;
