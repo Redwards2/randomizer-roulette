@@ -90,10 +90,11 @@ def html_circle_layout_js(names):
             let px = SIZE/2 + Math.cos(theta) * (RADIUS * 0.72);
             let py = SIZE/2 + Math.sin(theta) * (RADIUS * 0.72);
             // Give each a random velocity
-            let speed = Math.random() * 1.2 + 0.7; // pixels per frame
+            let speed = Math.random() * 2.4 + 1.2; // UNIQUE: speed now between 1.2 and 3.6 px per frame (double original)
             let dir = Math.random() * 2 * Math.PI;
             let vx = Math.cos(dir) * speed;
             let vy = Math.sin(dir) * speed;
+
             return {{
                 name,
                 x: px,
