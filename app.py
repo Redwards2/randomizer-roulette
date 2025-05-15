@@ -107,6 +107,17 @@ def html_circle_layout_js(names):
         document.getElementById('arena-root').appendChild(arena);
 
         const emojis = ["🎲","😎","🦄","🐲","👾","🦸‍♂️","🧙‍♂️","🦖","🤠","👽","🐸","👻","🤖","🐼","🐧","🦊","🐻","🦕","🧟","👩‍🚀"];
+        let emojiPool = emojis.slice(); // Clone the emoji array
+        if (NAMES.length > emojiPool.length) {{
+            // fallback: allow duplicates if more names than emojis
+            while (emojiPool.length < NAMES.length) emojiPool = emojiPool.concat(emojis);
+        }}
+        emojiPool = emojiPool.slice(0, NAMES.length);
+        for (let i = emojiPool.length - 1; i > 0; i--) {{
+            // Shuffle to randomize emoji assignment
+            const j = Math.floor(Math.random() * (i + 1));
+            [emojiPool[i], emojiPool[j]] = [emojiPool[j], emojiPool[i]];
+        }}
         let activeNames = NAMES.map((name, idx) => {{
             let theta = (2 * Math.PI * idx) / NAMES.length;
             let px = SIZE/2 + Math.cos(theta) * (RADIUS * 0.72);
@@ -115,8 +126,7 @@ def html_circle_layout_js(names):
             let dir = Math.random() * 2 * Math.PI;
             let vx = Math.cos(dir) * speed;
             let vy = Math.sin(dir) * speed;
-            // Assign a random emoji to each name
-            let emoji = emojis[Math.floor(Math.random() * emojis.length)];
+            let emoji = emojiPool[idx];
             return {{
                 name,
                 emoji,
@@ -156,7 +166,17 @@ def html_circle_layout_js(names):
                 if (!obj.el) {{
                     let el = document.createElement('div');
                     obj.el = el;
-                    el.innerHTML = `<div style='font-size:15px;font-weight:900;margin-bottom:1px;'>${{obj.name}}</div><div style='font-size:32px;line-height:1;'>${{obj.emoji}}</div>`;
+                   el.innerHTML = `
+                    <div style='display:flex; flex-direction:column; align-items:center; justify-content:center;'>
+                      <div style='font-size:15px;font-weight:900;margin-bottom:1px;text-align:center; width:max-content;'>
+                        ${{obj.name}}
+                      </div>
+                      <div style='font-size:32px;line-height:1;text-align:center;'>
+                        ${{obj.emoji}}
+                      </div>
+                    </div>
+                  `;
+
                     el.style.position = 'absolute';
                     el.style.fontWeight = '900';
                     el.style.left = obj.x + 'px';
