@@ -47,14 +47,14 @@ st.markdown(
         text-align: center;
     }}
     /* Make disabled button text always visible and legible */
-    button:disabled, .stButton>button[disabled] {
+    button:disabled, .stButton>button[disabled] {{
         color: #222 !important;      /* Change to white (#fff) for dark sidebar, or #222 for light button */
         opacity: 0.7 !important;     /* Make it more opaque */
         background: #eee !important; /* Keep the lighter background */
         border: 1.5px solid #bbb !important;
         font-weight: 600;
         cursor: not-allowed !important;
-    }
+    }}
     </style>
     """,
     unsafe_allow_html=True
