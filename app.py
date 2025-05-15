@@ -158,9 +158,7 @@ def html_circle_layout_js(names):
             elementsToKeep.forEach(el => arena.appendChild(el));
         
             activeNames.forEach(obj => {{
-                // Only render if not eliminated and not removed (popping elements are kept by above)
-                if (obj.removed) return;
-                if (obj.eliminated) return; // eliminated means it's popping right now (will be kept by elementsToKeep)
+                if (obj.removed || obj.eliminated) return; // Only create new elements for active, non-eliminated
                 let el = document.createElement('div');
                 obj.el = el;
                 el.innerHTML = `<div style='font-size:15px;font-weight:900;margin-bottom:1px;'>${{obj.name}}</div><div style='font-size:32px;line-height:1;'>${{obj.emoji}}</div>`;
