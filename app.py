@@ -56,27 +56,27 @@ def html_circle_layout_js(names):
         border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;
     }}
     @keyframes pop-out {{
-    0% {{
-        transform: translate(-50%,-50%) scale(1) rotate(0deg);
-        opacity: 1;
-        filter: none;
-    }}
-    60% {{
-        transform: translate(-50%,-50%) scale(1.22) rotate(12deg);
-        opacity: 1;
-        filter: blur(0.5px) brightness(1.1);
-    }}
-    80% {{
-        transform: translate(-50%,-50%) scale(0.85) rotate(-8deg);
-        opacity: 0.7;
-        filter: blur(2px) brightness(1.3);
-    }}
-    100% {{
-        transform: translate(-50%,-50%) scale(2.0) rotate(-17deg);
-        opacity: 0;
-        filter: blur(12px) brightness(2);
-    }}
-}}
+      0% {{
+          transform: translate(-50%,-50%) scale(1) rotate(0deg);
+          opacity: 1;
+          filter: none;
+      }}
+      60% {{
+          transform: translate(-50%,-50%) scale(1.22) rotate(12deg);
+          opacity: 1;
+          filter: blur(0.5px) brightness(1.1);
+      }}
+      80% {{
+          transform: translate(-50%,-50%) scale(0.85) rotate(-8deg);
+          opacity: 0.7;
+          filter: blur(2px) brightness(1.3);
+      }}
+      100% {{
+          transform: translate(-50%,-50%) scale(2.0) rotate(-17deg);
+          opacity: 0;
+          filter: blur(12px) brightness(2);
+      }}
+  }}
     </style>
     <div style='display: flex; justify-content: center; align-items: flex-start; gap: 40px;'>
         <div id='arena-root'></div>
@@ -264,7 +264,7 @@ def html_circle_layout_js(names):
             sparkle(toEliminate.el);
             standings.push(toEliminate.name);
             renderStandings();
-            setTimeout(() => {
+            setTimeout(() => {{
                 toEliminate.el && toEliminate.el.remove();
                 const stillLeft = activeNames.filter(n => !n.eliminated);
                 if (stillLeft.length > 1) {{
