@@ -4,6 +4,49 @@ import math  # Required for angle math
 import streamlit.components.v1 as components
 import time
 
+st.markdown(
+    """
+    <style>
+    /* Remove Streamlit’s default background and padding */
+    .stApp {
+        background: linear-gradient(135deg, #232946 0%, #00cfff 100%) !important;
+        min-height: 100vh !important;
+        padding: 0 !important;
+    }
+    /* Remove white box shadow and border from main container */
+    .block-container {
+        box-shadow: none !important;
+        background: transparent !important;
+        padding-top: 16px !important;
+    }
+    /* Sidebar styling for consistency */
+    section[data-testid="stSidebar"] {
+        background: rgba(44, 48, 80, 0.94) !important;
+        color: #fff !important;
+        border-radius: 24px 0 0 24px;
+        box-shadow: 0 8px 40px #0014, 0 0 0 2px #00cfff33;
+    }
+    /* Remove sidebar padding and add modern spacing */
+    section[data-testid="stSidebar"] .css-1lcbmhc, .css-1d391kg {
+        padding: 22px 18px 18px 18px !important;
+    }
+    /* App title styling */
+    h1 {
+        font-family: 'Montserrat', 'Arial Black', sans-serif;
+        letter-spacing: 2px;
+        font-size: 2.4rem !important;
+        background: linear-gradient(92deg, #3dd8fa 0%, #ffea36 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: brightness(1.5);
+        text-shadow: 0 2px 10px #0bb8ff, 0 1px 1px #111, 0 1px 6px #00cfff90;
+        text-align: center;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 # START: Circular layout renderer (JS Version)
 def html_circle_layout_js(names):
     import json
@@ -12,9 +55,6 @@ def html_circle_layout_js(names):
     radius = 155
     html_code = f'''
     <style>
-    body, .stApp {{
-        background: linear-gradient(135deg, #232946 0%, #00cfff 100%) !important;
-    }}
     #arena-root {{
         filter: drop-shadow(0 6px 18px #0007);
     }}
