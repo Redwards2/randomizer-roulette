@@ -264,7 +264,7 @@ def html_circle_layout_js(names):
             sparkle(toEliminate.el);
             standings.push(toEliminate.name);
             renderStandings();
-            setTimeout(() => {{
+            setTimeout(() => {
                 toEliminate.el && toEliminate.el.remove();
                 const stillLeft = activeNames.filter(n => !n.eliminated);
                 if (stillLeft.length > 1) {{
@@ -314,7 +314,7 @@ if 'start_count' not in st.session_state:
 if start:
     if len(names) >= 2:
         st.session_state['start_count'] += 1  # Force Streamlit to re-render component
-        st.success("Let the chaos begin!")
+        st.success("May the odds be ever in your Favor!")
     else:
         st.info("Add at least 2 names in the sidebar and hit Start.")
 
