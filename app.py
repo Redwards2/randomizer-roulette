@@ -281,7 +281,7 @@ st.title("🎯 Last Man Standing - Randomizer")
 with st.sidebar:
     st.header("Enter Names")
     names_input = st.text_area("Up to 10 names (one per line)", height=200)
-    start = st.button("Start Elimination")
+    start = st.button("Start")
     st.markdown("**App by [Redwards]**", unsafe_allow_html=True)
 
 names = [name.strip() for name in names_input.split("\n") if name.strip()]
@@ -289,8 +289,18 @@ if len(names) > 10:
     st.warning("Only the first 10 names will be used.")
     names = names[:10]
 
-if start and len(names) >= 2:
-    st.success("Let the chaos begin!")
+# START: Added session reset so each Start triggers a fresh round
+if 'start_count' not in st.session_state:
+    st.session_state['start_count'] = 0
+
+if start:
+    if len(names) >= 2:
+        st.session_state['start_count'] += 1  # Force Streamlit to re-render component
+        st.success("Let the chaos begin!")
+    else:
+        st.info("Add at least 2 names in the sidebar and hit Start.")
+
+# Always render component if "start_count" changes
+if st.session_state.get('start_count', 0) > 0 and len(names) >= 2:
     html_circle_layout_js(names)
-elif start:
-    st.info("Add at least 2 names in the sidebar and hit Start Elimination.")
+# END
