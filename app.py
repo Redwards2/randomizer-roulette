@@ -4,7 +4,7 @@ import math  # Required for angle math
 import streamlit.components.v1 as components
 import time
 
-st.set_page_config(page_title="Last Man Standing", layout="centered")
+st.set_page_config(page_title="Randomizer Roullette", layout="centered")
 
 st.markdown(
     """
