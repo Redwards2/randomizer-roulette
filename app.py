@@ -152,7 +152,7 @@ def html_circle_layout_js(names):
             activeNames.forEach(obj => {{
                 if (obj.removed) return; // Skip removed
         
-                // Only create the DOM node once per object
+                // Only create the DOM node ONCE per object
                 if (!obj.el) {{
                     let el = document.createElement('div');
                     obj.el = el;
@@ -175,11 +175,12 @@ def html_circle_layout_js(names):
                     el.style.userSelect = 'none';
                 }}
         
-                // For eliminated bubbles, stop updating their position so the animation can play
+                // Only update position for non-eliminated
                 if (!obj.eliminated) {{
                     obj.el.style.left = obj.x + 'px';
                     obj.el.style.top = obj.y + 'px';
                 }}
+                // For eliminated: do nothing; let the pop-out animation run undisturbed!
         
                 arena.appendChild(obj.el);
             }});
