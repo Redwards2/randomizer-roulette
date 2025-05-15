@@ -141,7 +141,7 @@ def html_circle_layout_js(names):
             s.style.transform = 'translate(-50%,-50%)';
             s.style.borderRadius = '50%';
             s.style.zIndex = 6;
-            s.innerHTML = '<svg width="36" height="36"><circle cx="18" cy="18" r="14" fill="none" stroke="#ffe52e" stroke-width="4" opacity="0.62"/><circle cx="18" cy="18" r="10" fill="#fffdbb99" opacity="0.45"/></svg>';
+            s.innerHTML = '<svg width=\"36\" height=\"36\"><circle cx=\"18\" cy=\"18\" r=\"14\" fill=\"none\" stroke=\"#ffe52e\" stroke-width=\"4\" opacity=\"0.62\"/><circle cx=\"18\" cy=\"18\" r=\"10\" fill=\"#fffdbb99\" opacity=\"0.45\"/></svg>';
             el.appendChild(s);
             setTimeout(() => s.remove(), 900);
         }}
@@ -159,7 +159,7 @@ def html_circle_layout_js(names):
             elementsToKeep.forEach(el => arena.appendChild(el));
         
             activeNames.forEach(obj => {{
-                if (obj.eliminated) return;
+                if (obj.eliminated || obj.removed) return;
                 let el = document.createElement('div');
                 obj.el = el;
                 el.innerHTML = `<div style='font-size:15px;font-weight:900;margin-bottom:1px;'>${{obj.name}}</div><div style='font-size:32px;line-height:1;'>${{obj.emoji}}</div>`;
@@ -221,27 +221,26 @@ def html_circle_layout_js(names):
 
         function animate() {{
             activeNames.forEach(obj => {{
-                if (!obj.eliminated) {{
-                    // Move by velocity
-                    obj.x += obj.vx;
-                    obj.y += obj.vy;
-                    // Bounce off edge of arena (circle)
-                    let cx = SIZE/2, cy = SIZE/2;
-                    let dx = obj.x - cx, dy = obj.y - cy;
-                    let dist = Math.sqrt(dx*dx + dy*dy);
-                    if (dist > RADIUS - 24) {{
-                        // Bounce: reflect velocity and move inside boundary
-                        let normX = dx / dist, normY = dy / dist;
-                        let dot = obj.vx * normX + obj.vy * normY;
-                        obj.vx -= 2 * dot * normX;
-                        obj.vy -= 2 * dot * normY;
-                        // Dampening for more realism
-                        obj.vx *= 0.92;
-                        obj.vy *= 0.92;
-                        // Bring just inside edge
-                        obj.x = cx + normX * (RADIUS - 25);
-                        obj.y = cy + normY * (RADIUS - 25);
-                    }}
+                if (obj.eliminated || obj.removed) return;
+                // Move by velocity
+                obj.x += obj.vx;
+                obj.y += obj.vy;
+                // Bounce off edge of arena (circle)
+                let cx = SIZE/2, cy = SIZE/2;
+                let dx = obj.x - cx, dy = obj.y - cy;
+                let dist = Math.sqrt(dx*dx + dy*dy);
+                if (dist > RADIUS - 24) {{
+                    // Bounce: reflect velocity and move inside boundary
+                    let normX = dx / dist, normY = dy / dist;
+                    let dot = obj.vx * normX + obj.vy * normY;
+                    obj.vx -= 2 * dot * normX;
+                    obj.vy -= 2 * dot * normY;
+                    // Dampening for more realism
+                    obj.vx *= 0.92;
+                    obj.vy *= 0.92;
+                    // Bring just inside edge
+                    obj.x = cx + normX * (RADIUS - 25);
+                    obj.y = cy + normY * (RADIUS - 25);
                 }}
             }});
             renderNames();
@@ -251,7 +250,7 @@ def html_circle_layout_js(names):
         animate();
 
         function eliminateNext() {{
-            const stillIn = activeNames.filter(n => !n.eliminated);
+            const stillIn = activeNames.filter(n => !n.eliminated && !n.removed);
             if (stillIn.length <= 1) {{
                 if (stillIn[0]) {{
                     standings.push(stillIn[0].name);
@@ -276,8 +275,9 @@ def html_circle_layout_js(names):
             standings.push(toEliminate.name);
             renderStandings();
             setTimeout(() => {{
-                toEliminate.el && toEliminate.el.remove();
-                const stillLeft = activeNames.filter(n => !n.eliminated);
+                if (toEliminate.el) toEliminate.el.remove();
+                toEliminate.removed = true; // Mark as fully removed!
+                const stillLeft = activeNames.filter(n => !n.eliminated && !n.removed);
                 if (stillLeft.length > 1) {{
                     setTimeout(eliminateNext, randomDelay());
                 }} else {{
