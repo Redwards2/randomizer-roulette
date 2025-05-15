@@ -56,7 +56,7 @@ def html_circle_layout_js(names):
         border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;
     }}
     @keyframes pop-out {{
-    0% {}
+    0% {{
         transform: translate(-50%,-50%) scale(1) rotate(0deg);
         opacity: 1;
         filter: none;
