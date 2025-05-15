@@ -55,6 +55,28 @@ def html_circle_layout_js(names):
     #standings-list li:last-child {{
         border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;
     }}
+    @keyframes pop-out {
+    0% {
+        transform: translate(-50%,-50%) scale(1) rotate(0deg);
+        opacity: 1;
+        filter: none;
+    }
+    60% {
+        transform: translate(-50%,-50%) scale(1.22) rotate(12deg);
+        opacity: 1;
+        filter: blur(0.5px) brightness(1.1);
+    }
+    80% {
+        transform: translate(-50%,-50%) scale(0.85) rotate(-8deg);
+        opacity: 0.7;
+        filter: blur(2px) brightness(1.3);
+    }
+    100% {
+        transform: translate(-50%,-50%) scale(2.0) rotate(-17deg);
+        opacity: 0;
+        filter: blur(12px) brightness(2);
+    }
+}
     </style>
     <div style='display: flex; justify-content: center; align-items: flex-start; gap: 40px;'>
         <div id='arena-root'></div>
@@ -237,13 +259,8 @@ def html_circle_layout_js(names):
             }}
             const toEliminate = stillIn[Math.floor(Math.random() * stillIn.length)];
             toEliminate.eliminated = true;
-            toEliminate.el.style.transition = 'opacity 1.2s, filter 1.3s, left 0.9s, top 0.9s, transform 0.6s cubic-bezier(.23,1.5,.32,1)';
-            const flyAngle = Math.atan2(toEliminate.y - SIZE/2, toEliminate.x - SIZE/2);
-            toEliminate.el.style.left = (SIZE / 2 + Math.cos(flyAngle) * (RADIUS + 110)) + 'px';
-            toEliminate.el.style.top = (SIZE / 2 + Math.sin(flyAngle) * (RADIUS + 110)) + 'px';
-            toEliminate.el.style.opacity = 0;
-            toEliminate.el.style.filter = 'blur(8px) brightness(2)';
-            toEliminate.el.style.transform = 'translate(-50%,-50%) scale(1.18) rotate(-17deg)';
+            toEliminate.el.style.animation = 'pop-out 1.1s cubic-bezier(.23,1.5,.32,1) forwards';
+            toEliminate.el.style.zIndex = 9;
             sparkle(toEliminate.el);
             standings.push(toEliminate.name);
             renderStandings();
